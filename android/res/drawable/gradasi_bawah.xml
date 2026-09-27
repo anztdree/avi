@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gradasi dasar zona bawah panel asisten (b20) — pola Google
+     Assistan: teks jawaban diberi DASAR gelap yang menguat ke arah
+     pill, supaya selalu terbaca walau app di belakang ramai (bug
+     bubble chat berlapis di v1.2). Layar ATAS tetap scrim tipis
+     0,30 — app di belakang tetap jelas terlihat. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:startColor="#00070F0C"
+        android:centerColor="#99070F0C"
+        android:endColor="#F2070F0C"/>
+</shape>

@@ -11,7 +11,7 @@ SRC=$PJ/src
 OUT=$PJ/build
 KST=/home/z/my-project/AVI/avi.keystore
 
-VER=1.2
+VER=1.3
 APK_NAME=AVI-v$VER.apk
 
 rm -rf "$OUT"
@@ -27,7 +27,7 @@ echo "[2/7] aapt2 link (R.java + resource apk)..."
   --manifest "$PJ/AndroidManifest.xml" \
   --java "$OUT/gen" \
   --min-sdk-version 24 --target-sdk-version 34 \
-  --version-code 3 --version-name "$VER" \
+  --version-code 4 --version-name "$VER" \
   --auto-add-overlay \
   "$OUT/res.zip"
 

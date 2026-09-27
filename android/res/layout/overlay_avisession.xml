@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SESI ASISTEN AVI v1.2 (b19) — PANEL GOOGLE MURNI, disetujui
+<!-- SESI ASISTEN AVI v1.3 (b20) — PANEL GOOGLE MURNI, disetujui
      pemilik lewat kalibrasi visual web (Task 13-17):
 
      Yang ADA (persis web yang disetujui):
@@ -21,6 +21,12 @@
        denyut tombol mic — dua elemen = dua fungsi),
      - tanpa petunjuk "usap ke bawah".
 
+     Baru b20 (laporan pemilik): DASAR GELAP menguat dari bawah
+     (pola Google Assistan) di zona jawaban + pill — app di belakang
+     tidak lagi bertabrakan dengan teks melayang; mic saat
+     MENDENGARKAN = tombol SOLID teal + ikon gelap + pill berubah
+     "Mendengarkan…" (sebelumnya cuma latar 18% — tak terlihat jelas).
+
      Mesin menyala otomatis begitu panel tergambar (mic langsung
      siap mendengarkan — Task 17); tanpa izin mic, pill ketik tetap
      hidup. Root menelan sentuhan kosong = tutup.-->
@@ -31,6 +37,15 @@
     android:background="#4D070F0C"
     android:clickable="true"
     android:focusable="true">
+
+    <!-- ===== dasar gelap zona bawah (b20, pola Google Assistan):
+         jawaban melayang + pill selalu terbaca walau app di
+         belakang ramai — layar atas tetap 0,30 terang ===== -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="340dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/gradasi_bawah"/>
 
     <!-- ===== jawaban AVI: melayang, menempel di atas pill ===== -->
     <LinearLayout

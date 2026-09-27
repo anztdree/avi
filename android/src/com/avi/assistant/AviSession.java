@@ -24,12 +24,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Sesi ASISTEN PERANGKAT AVI v1.2 (b19) — jalur VoiceInteractionSession
+ * Sesi ASISTEN PERANGKAT AVI v1.3 (b20) — jalur VoiceInteractionSession
  * untuk HP NON-low-RAM. Tampilan & kelakuan IDENTIK dengan
  * OrbitAssistActivity: PANEL GOOGLE MURNI hasil kalibrasi web
  * (Task 13-17) — scrim tipis 0,30, jawaban AVI melayang di atas pill,
  * SATU bar "Tanya AVI…" + tombol suara tiga peran (mic/kirim/stop).
  * Tanpa salam, tanpa ✕, tanpa titik, tanpa status.
+ *
+ * Baru b20 (laporan pemilik): dasar gelap menguat dari bawah di zona
+ * jawaban+pill (pola Google Assistan — app di belakang tak lagi
+ * bertabrakan dengan teks), dan mic MENDENGARKAN kini SOLID teal +
+ * ikon gelap + pill "Mendengarkan…" — keadaan kerja terlihat jelas.
  *
  * Kata-kata pemilik hidup DI DALAM pill (bicara maupun ketik) dan hilang
  * sendiri saat giliran tuntas. Mesin menyala otomatis begitu sesi
@@ -164,6 +169,13 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
         if (bSuara == null || ikonSuara == null) return;
         GradientDrawable latar = (GradientDrawable) bSuara.getBackground().mutate();
 
+        // b20: pill ikut menyebut keadaan — cermin placeholder web;
+        // keadaan kerja mic kini terlihat dari DUA tempat
+        if (etPil != null) {
+            etPil.setHint(keadaan == OrbView.MENDENGARKAN && micSip
+                    ? "Mendengarkan…" : "Tanya AVI…");
+        }
+
         if (!micSip) {                        // mic tak tersedia — ketik saja
             ikonSuara.setImageResource(R.drawable.ic_mic);
             ikonSuara.setColorFilter(0xFF9AA8A4);
@@ -186,11 +198,13 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             latar.setColor(0x24FFFFFF);
             berhentiDenyut();
         } else {                                            // PERAN 1: mic
+            boolean dengar = keadaan == OrbView.MENDENGARKAN;
             ikonSuara.setImageResource(R.drawable.ic_mic);
-            ikonSuara.setColorFilter(0xFF2DD4BF);
-            latar.setColor(keadaan == OrbView.MENDENGARKAN
-                    ? 0x2E2DD4BF : 0x1A2DD4BF);
-            denyutkan(keadaan == OrbView.MENDENGARKAN);
+            // b20: saat mendengarkan tombol SOLID teal + ikon gelap —
+            // keadaan kerja jelas terlihat (latar 18% dulu terlalu samar)
+            ikonSuara.setColorFilter(dengar ? 0xFF07120F : 0xFF2DD4BF);
+            latar.setColor(dengar ? 0xFF2DD4BF : 0x1A2DD4BF);
+            denyutkan(dengar);
         }
     }
 
