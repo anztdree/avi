@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.avi.assistant"
-    android:versionCode="4"
-    android:versionName="1.3">
+    android:versionCode="5"
+    android:versionName="1.4">
 
     <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34"/>
 
@@ -80,6 +80,15 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
         <activity android:name=".OnboardingActivity" android:exported="false"/>
+
+        <!-- b21: peminta izin mic dari panel asisten — transparan, hidup
+             sebentar, pulang seketika; VoiceInteractionSession tak bisa
+             requestPermissions sendiri. -->
+        <activity android:name=".MintaIzinMicActivity"
+            android:exported="false"
+            android:theme="@style/TemaSesiOrbit"
+            android:excludeFromRecents="true"
+            android:noHistory="true"/>
 
         <!-- Asisten perangkat: AVI dipanggil lewat tahan tombol home /
              sapu sudut bawah, seperti Google Assistant. Pemicu dipegang

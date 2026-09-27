@@ -3,7 +3,9 @@ package com.avi.assistant;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
+import android.Manifest;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,6 +32,10 @@ import android.widget.TextView;
  * jawaban+pill (pola Google Assistan — app di belakang tak lagi
  * bertabrakan dengan teks), dan mic MENDENGARKAN kini SOLID teal +
  * ikon gelap + pill "Mendengarkan…" — keadaan kerja terlihat jelas.
+ *
+ * Baru b21 (laporan pemilik): balasan AI dalam BUBBLE; izin mic
+ * DIMINTA seketika panel terbuka dan begitu diberikan mic menyala
+ * sendiri; panel TAK tidur sendiri saat hening (tidurBilaSenyap=false).
  *
  * Otomatis (Task 17): mesin menyala begitu panel tergambar — mic
  * langsung siap mendengarkan bila izin ada; tanpa izin mic, pill ketik
@@ -132,7 +138,14 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
                 if (isFinishing() || isDestroyed() || mesin == null) return;
                 micSip = mesin.izinMicAda();
                 perbaruiTombol();
+                mesin.tidurBilaSenyap = false;   // b21: panel terus mendengar
                 mesin.mulai();          // OTOMATIS siap mendengarkan
+                // b21: izin mic belum ada? MINTA SEKARANG — dulu tidak
+                // ada satu pun yang meminta, mesin mati diam tanpa pesan
+                if (!micSip) {
+                    requestPermissions(
+                            new String[]{Manifest.permission.RECORD_AUDIO}, 11);
+                }
             });
         }
     }
@@ -150,6 +163,23 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
         if (mesin != null) { mesin.hentikan(); mesin = null; }
         berhentiDenyut();
         super.onDestroy();
+    }
+
+    /** b21: izin mic baru saja diberikan → dengaran langsung nyala
+     *  tanpa disentuh (hidupkan ulang mesin yang tadinya mati diam). */
+    @Override
+    public void onRequestPermissionsResult(int kode, String[] izin, int[] hasil) {
+        super.onRequestPermissionsResult(kode, izin, hasil);
+        if (kode != 11 || mesin == null) return;
+        if (izin.length > 0 && Manifest.permission.RECORD_AUDIO.equals(izin[0])
+                && hasil.length > 0
+                && hasil[0] == PackageManager.PERMISSION_GRANTED) {
+            micSip = mesin.izinMicAda();
+            perbaruiTombol();
+            mesin.hentikan();
+            mesin.mulai();
+            mesinJalan = true;
+        }
     }
 
     private void pamit() { finish(); }

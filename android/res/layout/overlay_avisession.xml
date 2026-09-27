@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SESI ASISTEN AVI v1.3 (b20) — PANEL GOOGLE MURNI, disetujui
+<!-- SESI ASISTEN AVI v1.4 (b21) — PANEL GOOGLE MURNI, disetujui
      pemilik lewat kalibrasi visual web (Task 13-17):
 
      Yang ADA (persis web yang disetujui):
@@ -26,6 +26,12 @@
      tidak lagi bertabrakan dengan teks melayang; mic saat
      MENDENGARKAN = tombol SOLID teal + ikon gelap + pill berubah
      "Mendengarkan…" (sebelumnya cuma latar 18% — tak terlihat jelas).
+
+     Baru b21 (laporan pemilik): (1) balasan AI kini dalam BUBBLE
+     (bubble_jawaban_sesi — pola obrolan, warna sama dgn pill);
+     (2) izin mic DIMINTA seketika panel terbuka, dan begitu
+     diberikan mic langsung menyala tanpa disentuh; (3) panel tak
+     tidur sendiri saat hening — terus mendengar (pola web b19).
 
      Mesin menyala otomatis begitu panel tergambar (mic langsung
      siap mendengarkan — Task 17); tanpa izin mic, pill ketik tetap
@@ -80,10 +86,11 @@
                 android:textColor="#F2F7F5"
                 android:textSize="15sp"
                 android:lineSpacingMultiplier="1.35"
-                android:shadowColor="#A6070F0C"
-                android:shadowDx="0"
-                android:shadowDy="1"
-                android:shadowRadius="4"
+                android:background="@drawable/bubble_jawaban_sesi"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
                 android:maxLines="12"
                 android:ellipsize="end"/>
         </LinearLayout>

@@ -3,6 +3,7 @@ package com.avi.assistant;
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -35,6 +36,11 @@ import android.widget.TextView;
  * jawaban+pill (pola Google Assistan — app di belakang tak lagi
  * bertabrakan dengan teks), dan mic MENDENGARKAN kini SOLID teal +
  * ikon gelap + pill "Mendengarkan…" — keadaan kerja terlihat jelas.
+ *
+ * Baru b21 (laporan pemilik): balasan AI dalam BUBBLE; izin mic
+ * DIMINTA seketika panel terbuka (MintaIzinMicActivity) dan begitu
+ * diberikan mic menyala sendiri; panel TAK tidur sendiri saat hening
+ * (tidurBilaSenyap=false — terus mendengar sampai ditutup manual).
  *
  * Kata-kata pemilik hidup DI DALAM pill (bicara maupun ketik) dan hilang
  * sendiri saat giliran tuntas. Mesin menyala otomatis begitu sesi
@@ -146,8 +152,32 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             if (mesin == null || d == null || !d.isShowing()) return;
             micSip = mesin.izinMicAda();
             perbaruiTombol();
+            mesin.tidurBilaSenyap = false;   // b21: panel terus mendengar
             mesin.mulai();
+            // b21: izin mic belum ada? MINTA SEKARANG — dulu tidak ada
+            // satu pun yang meminta, mesin mati diam tanpa pesan
+            if (!micSip) mintaIzinMic();
         });
+    }
+
+    /** b21: izin mic diminta lewat activity transparan kecil
+     *  (VoiceInteractionSession tak bisa requestPermissions).
+     *  Begitu diberikan, dengaran langsung nyala tanpa disentuh. */
+    private void mintaIzinMic() {
+        try {
+            MintaIzinMicActivity.saatDiizinkan = () -> {
+                if (mesin == null || akar == null) return;
+                micSip = mesin.izinMicAda();
+                perbaruiTombol();
+                mesin.hentikan();
+                mesin.mulai();   // hidupkan ulang — mic kini siap mendengarkan
+            };
+            Intent it = new Intent(getContext(), MintaIzinMicActivity.class);
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(it);
+        } catch (Exception ignored) {
+            // tanpa izin pun panel tetap hidup lewat jalur ketik
+        }
     }
 
     @Override

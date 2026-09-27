@@ -129,6 +129,13 @@ public class LiveEngine {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    /** b21 (pola web b19/Task 17): false = panel asisten TETAP TERBUKA &
+     *  terus mendengar walau hening (belum ada ucapan sama sekali) —
+     *  dulu panel tidur sendiri ±10 dtk sehingga pemilik merasa mic
+     *  "tidak bekerja dan tidak saling ngobrol". Default true = perilaku
+     *  Mode Live lama (tidur saat hening, pola Siri/GA). */
+    public boolean tidurBilaSenyap = true;
+
     // ============================ siklus hidup ============================
 
     public void mulai() {
@@ -402,13 +409,17 @@ public class LiveEngine {
         setKeadaan(OrbView.SIAP);
         p.status("Verifikasi suara — ucapkan \u201CHai AVI\u201D (sentuh titik = lewat)");
         p.transkripAnda("");
-        p.teksAvi("");
+        // b21: prompt gerbang TAMPIL di bubble jawaban — dulu cuma lewat
+        // status yang sengaja tak tampil di panel, jadi pemilik hanya
+        // melihat panel diam dan merasa mic "tidak bekerja"
+        p.teksAvi("Ucapkan \u201CHai AVI\u201D untuk memulai — verifikasi suara pemilik.");
         if (gerbang != null) gerbang.hentikan();
         gerbang = new GerbangSapa(ctx, new GerbangSapa.Panggilan() {
             @Override public void menunggu(int kes, int maks) {
                 if (!hidup || sudahTidur) return;
                 p.status("Verifikasi (coba " + kes + "/" + maks
                         + ") — ucapkan \u201CHai AVI\u201D");
+                p.teksAvi("Ucapkan \u201CHai AVI\u201D… (coba " + kes + "/" + maks + ")");
             }
             @Override public void hasil(boolean lolos, int persen, String pesan) {
                 if (!hidup || sudahTidur) { gerbang = null; return; }
@@ -417,6 +428,7 @@ public class LiveEngine {
                     lolosSampaiMs = System.currentTimeMillis();   // cache 15 menit
                     p.status("Dikenali, " + AviBrain.namaPemilik(ctx)
                             + " ✓ (" + persen + "%) — silakan bicara.");
+                    p.teksAvi("");
                     jadwalMendengarkan(250);
                     return;
                 }
@@ -427,6 +439,7 @@ public class LiveEngine {
                 // lembut: tetap melayani, tapi diberitahu
                 p.status("Suara belum cocok penuh (" + persen + "%) — tetap "
                         + "saya layani, " + AviBrain.namaPemilik(ctx) + ".");
+                p.teksAvi("");
                 jadwalMendengarkan(250);
             }
         });
@@ -437,6 +450,7 @@ public class LiveEngine {
     private void tolakAkses() {
         setKeadaan(OrbView.SIAP);
         p.status("Maaf, saya hanya melayani " + AviBrain.namaPemilik(ctx) + ".");
+        p.teksAvi("Maaf, saya hanya melayani " + AviBrain.namaPemilik(ctx) + ".");
         if (ttsSiap && tts != null) {
             tts.speak("Maaf, saya hanya melayani " + AviBrain.namaPemilik(ctx)
                     + ". AVI pamit dulu.", TextToSpeech.QUEUE_ADD, null, ID_PAMIT);
@@ -586,7 +600,14 @@ public class LiveEngine {
                         return;
                     }
                     hitungHening = 0;
-                    if (!punyaPercakapan) { tidurSekarang(); return; }
+                    if (!punyaPercakapan) {
+                        if (tidurBilaSenyap) { tidurSekarang(); return; }
+                        // b21 (pola web b19): panel tetap terbuka — terus
+                        // mendengar tanpa disuruh; ditutup manual saja
+                        p.status("Masih mendengarkan — panel tetap terbuka…");
+                        jadwalMendengarkan(200);
+                        return;
+                    }
                     mulaiPamit();
                     return;
                 }
