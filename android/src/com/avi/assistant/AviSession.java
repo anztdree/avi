@@ -1,42 +1,55 @@
 package com.avi.assistant;
 
+import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionSession;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Sesi ASISTEN PERANGKAT AVI — jalur VoiceInteractionSession untuk HP
- * NON-low-RAM (b18). Tampilan & kelakuan IDENTIK dengan
- * OrbitAssistActivity: lapisan gelap penuh layar ala Google Assistant,
- * greeting kiri atas, EMPAT TITIK kiri bawah, transkrip + jawaban
- * polos di kiri tengah, usap ke bawah untuk menutup.
+ * Sesi ASISTEN PERANGKAT AVI v1.2 (b19) — jalur VoiceInteractionSession
+ * untuk HP NON-low-RAM. Tampilan & kelakuan IDENTIK dengan
+ * OrbitAssistActivity: PANEL GOOGLE MURNI hasil kalibrasi web
+ * (Task 13-17) — scrim tipis 0,30, jawaban AVI melayang di atas pill,
+ * SATU bar "Tanya AVI…" + tombol suara tiga peran (mic/kirim/stop).
+ * Tanpa salam, tanpa ✕, tanpa titik, tanpa status.
  *
- * Ringan seperti Google: onCreateContentView hanya menempel layout
- * statis (tanpa render riwayat, tanpa orb 60fps); mesin menyala lewat
- * akar.post() — SETELAH sesi tergambar. Papan pesan tunggal tetap
- * hidup lewat penyimpanan riwayat AviBrain (dibaca aplikasi AVI).
- *
- * Isi = mesin Mode Live yang sama (LiveEngine): dengar → pikir → jawab
- * → dengar lagi; hening beberapa detik = AVI pamit lalu sesi menutup
- * sendiri dan pemilik kembali ke aplikasi yang tadi dibuka.
+ * Kata-kata pemilik hidup DI DALAM pill (bicara maupun ketik) dan hilang
+ * sendiri saat giliran tuntas. Mesin menyala otomatis begitu sesi
+ * tergambar — mic langsung siap mendengarkan; tanpa izin mic, pill ketik
+ * tetap hidup. Menutup: ketuk area kosong, usap ke bawah, atau AVI pamit.
  */
 public class AviSession extends VoiceInteractionSession implements LiveEngine.Pendengar {
 
     private View akar;
-    private TitikEmpat titik;
-    private TextView tvSapa, tvStatus, tvAnda, tvAvi;
+    private View barisJawaban;
+    private EditText etPil;
+    private ImageView ikonSuara;
+    private TextView tvAvi;
+    private View bSuara;
     private LiveEngine mesin;
     private GestureDetector usap;
+    private ObjectAnimator denyut;
+    private int keadaan = OrbView.SIAP;
+    private boolean micSip = true;
+    private boolean transkripDiPil = false;
 
     public AviSession(Context context) {
         super(context);
@@ -45,15 +58,14 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     @Override
     public View onCreateContentView() {
         akar = getLayoutInflater().inflate(R.layout.overlay_avisession, null);
-        titik = akar.findViewById(R.id.titikSesi);
-        tvSapa = akar.findViewById(R.id.tvSapa);
-        tvStatus = akar.findViewById(R.id.tvStatusSesi);
-        tvAnda = akar.findViewById(R.id.tvAndaSesi);
+        barisJawaban = akar.findViewById(R.id.barisJawabanSesi);
+        etPil = akar.findViewById(R.id.etPilSesi);
+        ikonSuara = akar.findViewById(R.id.ikonSuaraSesi);
+        bSuara = akar.findViewById(R.id.bSuaraSesi);
         tvAvi = akar.findViewById(R.id.tvAviSesi);
 
-        tvSapa.setText("Hai, " + AviBrain.namaPemilik(getContext()));
-
-        // Google: ketuk area kosong TIDAK menutup; usap ke bawah menutup
+        // usap ke bawah = tutup; ketukan biasa diteruskan ke onClick akar
+        // = KETUK AREA KOSONG = tutup (pola web disetujui)
         usap = new GestureDetector(getContext(),
                 new GestureDetector.SimpleOnGestureListener() {
             @Override public boolean onFling(MotionEvent a, MotionEvent b,
@@ -66,21 +78,43 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             }
         });
         akar.setOnTouchListener((v, ev) -> usap.onTouchEvent(ev));
+        akar.setOnClickListener(v -> finish());
 
-        akar.findViewById(R.id.btnTutupSesi).setOnClickListener(v -> finish());
-        titik.setOnClickListener(v -> {
+        // barge-in: sentuh jawaban saat AVI bicara = langsung diam
+        tvAvi.setOnClickListener(v -> {
+            if (mesin != null && keadaan == OrbView.BICARA) mesin.potongTts();
+        });
+
+        // tombol suara: kirim ketikan / stop TTS (mic = cuma umpan balik)
+        bSuara.setOnClickListener(v -> {
             if (mesin == null) return;
-            int k = titik.getKeadaan();
-            if (k == TitikEmpat.BICARA) mesin.potongTts();      // barge-in
-            else if (k == TitikEmpat.SIAP) mesin.dengarkanLagi();
+            String t = etPil.getText().toString().trim();
+            if (!transkripDiPil && !t.isEmpty()) { mesin.teksManual(t); return; }
+            if (keadaan == OrbView.BICARA) mesin.potongTts();
+        });
+
+        // Enter di pill = kirim (pola web)
+        etPil.setOnEditorActionListener((v, aksi, ev) -> {
+            if (aksi == EditorInfo.IME_ACTION_SEND
+                    || ev != null && ev.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                String t = etPil.getText().toString().trim();
+                if (!t.isEmpty() && mesin != null) mesin.teksManual(t);
+                return true;
+            }
+            return false;
+        });
+        etPil.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void afterTextChanged(Editable s) { perbaruiTombol(); }
         });
         return akar;
     }
 
     @Override
     public void onShow(Bundle args, int showFlags) {
-        // jendela transparan menutup seluruh layar; gambarannya scrim
-        // gelap milik layout — tanpa dim sistem tambahan.
+        // jendela transparan menutup seluruh layar; scrim tipis 0,30
+        // digambar layout sendiri — tanpa dim sistem tambahan
         Dialog jendela = getWindow();
         if (jendela != null && jendela.getWindow() != null) {
             Window w = jendela.getWindow();
@@ -89,6 +123,8 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             w.setGravity(Gravity.BOTTOM);
             w.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
+            // pill ketik: keyboard mendorong isi, bukan menutupi
+            w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
 
         // satu animasi pendek saja — sesi muncul nyaris seketika
@@ -98,67 +134,125 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
         }
 
         if (mesin == null) mesin = new LiveEngine(getContext(), this);
-        // b18: mesin menyala SETELAH sesi tergambar (sama seperti jalur
-        // activity) — panel tidak pernah menunggu bind SpeechRecognizer
+        // mesin menyala SETELAH sesi tergambar — OTOMATIS siap
+        // mendengarkan; pill ketik tetap hidup bila mic tak tersedia
         akar.post(() -> {
             Dialog d = getWindow();
             if (mesin == null || d == null || !d.isShowing()) return;
-            if (mesin.izinMicAda()) {
-                mesin.mulai();
-            } else {
-                status("Izin mikrofon belum ada — buka aplikasi AVI sekali dulu.");
-            }
+            micSip = mesin.izinMicAda();
+            perbaruiTombol();
+            mesin.mulai();
         });
     }
 
     @Override
     public void onHide() {
         if (mesin != null) mesin.hentikan();
+        berhentiDenyut();
     }
 
     @Override
     public void onDestroy() {
         if (mesin != null) { mesin.hentikan(); mesin = null; }
+        berhentiDenyut();
         super.onDestroy();
+    }
+
+    // ================= wajah tombol suara (tiga peran) =================
+
+    private void perbaruiTombol() {
+        if (bSuara == null || ikonSuara == null) return;
+        GradientDrawable latar = (GradientDrawable) bSuara.getBackground().mutate();
+
+        if (!micSip) {                        // mic tak tersedia — ketik saja
+            ikonSuara.setImageResource(R.drawable.ic_mic);
+            ikonSuara.setColorFilter(0xFF9AA8A4);
+            latar.setColor(0x1A2DD4BF);
+            bSuara.setEnabled(false);
+            berhentiDenyut();
+            return;
+        }
+        bSuara.setEnabled(true);
+
+        String ketikan = etPil.getText().toString().trim();
+        if (!transkripDiPil && !ketikan.isEmpty()) {        // PERAN 2: kirim
+            ikonSuara.setImageResource(R.drawable.ic_send);
+            ikonSuara.setColorFilter(0xFFFFFFFF);
+            latar.setColor(AviBrain.warnaAksen(getContext()));
+            berhentiDenyut();
+        } else if (keadaan == OrbView.BICARA) {             // PERAN 3: stop
+            ikonSuara.setImageResource(R.drawable.ic_stop);
+            ikonSuara.setColorFilter(0xFFF2F7F5);
+            latar.setColor(0x24FFFFFF);
+            berhentiDenyut();
+        } else {                                            // PERAN 1: mic
+            ikonSuara.setImageResource(R.drawable.ic_mic);
+            ikonSuara.setColorFilter(0xFF2DD4BF);
+            latar.setColor(keadaan == OrbView.MENDENGARKAN
+                    ? 0x2E2DD4BF : 0x1A2DD4BF);
+            denyutkan(keadaan == OrbView.MENDENGARKAN);
+        }
+    }
+
+    /** Umpan balik dengar: tombol mic berdenyut halus (pola web aviDenyut). */
+    private void denyutkan(boolean nyala) {
+        if (nyala) {
+            if (denyut == null) {
+                denyut = ObjectAnimator.ofFloat(bSuara, "alpha", 1f, 0.55f);
+                denyut.setDuration(700L);
+                denyut.setRepeatCount(ObjectAnimator.INFINITE);
+                denyut.setRepeatMode(ObjectAnimator.REVERSE);
+            }
+            if (!denyut.isRunning()) denyut.start();
+        } else {
+            berhentiDenyut();
+        }
+    }
+
+    private void berhentiDenyut() {
+        if (denyut != null) { denyut.cancel(); denyut = null; }
+        if (bSuara != null) bSuara.setAlpha(1f);
     }
 
     // ================= peristiwa dari mesin (thread utama) =================
 
     @Override public void keadaan(int k) {
-        if (titik != null) titik.setKeadaan(k);
+        keadaan = k;
+        perbaruiTombol();
     }
 
     @Override public void status(String teks) {
-        if (tvStatus != null) tvStatus.setText(teks);
+        // tanpa teks status — murni obrolan (pola web disetujui)
     }
 
+    /** Kata-kata pemilik HIDUP DI DALAM pill — bicara maupun ketik
+     *  (pola web Task 15); "" = bersihkan (potong / pamit). */
     @Override public void transkripAnda(String teks) {
-        if (tvAnda == null) return;
-        if (teks == null || teks.trim().length() == 0) {
-            tvAnda.setVisibility(View.GONE);
-            return;
-        }
-        tvAnda.setVisibility(View.VISIBLE);
-        tvAnda.setText(teks);
+        if (etPil == null) return;
+        String t = teks == null ? "" : teks;
+        transkripDiPil = !t.trim().isEmpty();
+        etPil.setText(t);
+        if (transkripDiPil) etPil.setSelection(t.length());
     }
 
     @Override public void teksAvi(String teks) {
-        if (tvAvi == null) return;
+        if (tvAvi == null || barisJawaban == null) return;
         if (teks == null || teks.trim().length() == 0) {
-            tvAvi.setVisibility(View.GONE);
+            barisJawaban.setVisibility(View.GONE);
             return;
         }
-        tvAvi.setVisibility(View.VISIBLE);
+        barisJawaban.setVisibility(View.VISIBLE);
         tvAvi.setText(teks);
     }
 
-    /** Giliran selesai — pasangan sudah tersimpan ke riwayat bersama
-     *  oleh AviBrain.tanyaStream. Transkrip & jawaban dibiarkan terlihat
-     *  sampai giliran berikutnya (ala Google). */
-    @Override public void giliranBeres() { }
+    /** Giliran tuntas — pill kembali jadi input kosong (pola web). */
+    @Override public void giliranBeres() {
+        transkripDiPil = false;
+        if (etPil != null) etPil.setText("");
+    }
 
     @Override public void rms(float rmsdb) {
-        if (titik != null) titik.setRms(rmsdb);
+        // titik dihapus — tidak ada yang perlu digerakkan
     }
 
     @Override public void tetidur() {

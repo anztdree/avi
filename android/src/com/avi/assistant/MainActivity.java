@@ -25,14 +25,15 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Layar utama AVI: riwayat chat bergaya gelembung + input pill
- * kirim⇄mic + sapaan hero & chips saran saat masih kosong.
+ * Layar utama AVI v1.2: riwayat chat bergaya gelembung + input pill
+ * kirim⇄mic. Hero diringkas (b19): logo 4 titik statis + salam —
+ * tanpa orb bernapas, tanpa kartu saran (kalibrasi web Task 11).
  * Mode Live (mic) membuka LiveActivity; hasilnya ikut masuk riwayat ini.
  */
 public class MainActivity extends Activity {
 
     private ListView daftar;
-    private LinearLayout heroBox, barisChips;
+    private LinearLayout heroBox;
     private TextView tvSalam, tvSub;
     private EditText etInput;
     private ImageView bAksi;
@@ -71,7 +72,6 @@ public class MainActivity extends Activity {
 
         daftar     = findViewById(R.id.daftarChat);
         heroBox    = findViewById(R.id.heroBox);
-        barisChips = findViewById(R.id.barisChips);
         tvSalam    = findViewById(R.id.tvSalam);
         tvSub      = findViewById(R.id.tvSub);
         etInput    = findViewById(R.id.etInput);
@@ -80,23 +80,11 @@ public class MainActivity extends Activity {
         tvSalam.setText(sapaan());
         tvSub.setText("Ada yang bisa AVI bantu, " + AviBrain.namaPemilik(this) + "?");
 
-        // orb hero ikut warna aksen tema (biru pekat saat cerah, sian saat gelap)
-        ((OrbView) findViewById(R.id.orbHero)).setWarnaOrb(AviBrain.warnaAksen(this));
-
         // ATURAN PEMILIK: TIDAK ADA tombol "Percakapan baru" — tahan home,
         // Mode Live, dan chat di aplikasi ini adalah SATU papan pesan yang
         // sama yang mengalir terus (AviBrain.riwayat).
         findViewById(R.id.btnPengaturan).setOnClickListener(v ->
                 startActivity(new Intent(this, SettingsActivity.class)));
-
-        // kartu saran (kisi 2x2): sentuh = langsung tanya
-        for (int idKartu : new int[]{R.id.chip1, R.id.chip2, R.id.chip3, R.id.chip4}) {
-            View kartu = findViewById(idKartu);
-            kartu.setOnClickListener(v -> {
-                TextView teks = (TextView) kartu.findViewWithTag("teks");
-                if (teks != null) kirim(teks.getText().toString());
-            });
-        }
 
         bAksi.setOnClickListener(v -> {
             String t = etInput.getText().toString().trim();

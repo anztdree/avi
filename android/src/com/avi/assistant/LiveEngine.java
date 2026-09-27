@@ -381,6 +381,21 @@ public class LiveEngine {
         mulaiMendengarkan();
     }
 
+    /** Jalur ketik (b19): pill "Tanya AVI…" pada panel asisten — setara
+     *  hasil recognizer final, dipakai juga bila mic tidak tersedia.
+     *  pengenal.cancel() TANPA callback (beda dgn stopListening yang
+     *  memicu onResults kosong → bisa salah masuk jalur hening). */
+    public void teksManual(String teks) {
+        String t = teks == null ? "" : teks.trim();
+        if (t.isEmpty() || !hidup || sudahTidur) return;
+        if (pengenal != null) {
+            try { pengenal.cancel(); } catch (Exception ignored) {}
+        }
+        hitungHening = 0;
+        p.transkripAnda(t);
+        ajukanKeAi(t);
+    }
+
     // ==================== gerbang sapa (kalibrasi v2) ====================
 
     private void jalankanGerbang() {

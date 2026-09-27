@@ -1,151 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SESI ASISTEN AVI — DISKONTEK PERSIS UI GOOGLE ASSISTANT SAAT TAHAN
-     TOMBOL HOME (b18, permintaan pemilik: "ringkas seperti Google").
+<!-- SESI ASISTEN AVI v1.2 (b19) — PANEL GOOGLE MURNI, disetujui
+     pemilik lewat kalibrasi visual web (Task 13-17):
 
-     Yang ADA di Google dan sekarang ada di sini:
-     - lapisan gelap transparan MEMENUHI LAYAR (bukan kartu mengapung);
-     - greeting kiri ATAS: "Hai, [nama]" + "Ada yang bisa saya bantu?";
-     - transkrip + jawaban sebagai teks polos di KIRI TENGAH;
-     - EMPAT TITIK warna di KIRI BAWAH yang hidup saat bekerja;
-     - status kecil di samping titik; tombol tutup kecil kanan atas;
-     - usap ke bawah = tutup (pola Google).
+     Yang ADA (persis web yang disetujui):
+     - layar belakang HANYA disentuh redup tipis 0,30 (#4D070F0C —
+       nyaris terang; app di belakang jelas terlihat);
+     - jawaban AVI melayang di ATAS pill, logo 4 titik di kirinya,
+       teks diberi BAYANGAN (pola subtitle) agar terbaca di tema
+       cerah maupun gelap — TANPA menutup layar;
+     - SATU bar di bawah: pill "Tanya AVI…" + tombol suara;
+     - KATA-KATA PEMILIK (bicara maupun ketik) tampil DI DALAM pill,
+       hilang sendiri saat giliran tuntas (pola web Task 15);
+     - tombol suara TIGA PERAN: mic (denyut saat mendengarkan) →
+       kirim (ada ketikan) → stop (AVI sedang bicara);
+     - usap ke bawah = tutup; KETUK area kosong = tutup.
 
-     Yang TIDAK ada lagi (biar ringan & persis Google):
-     - tanpa kartu mengapung 28dp, tanpa gagang genggam;
-     - tanpa orb gradien 100dp berputar 60fps di tengah;
-     - tanpa papan riwayat di panel — papan tunggal hidup di aplikasi AVI.
+     Yang TIDAK ada lagi (dibanding b18):
+     - tanpa salam "Hai, ...", tanpa tombol ✕, tanpa teks status,
+     - tanpa EMPAT TITIK beranimasi (umpan balik dengar cukup dari
+       denyut tombol mic — dua elemen = dua fungsi),
+     - tanpa petunjuk "usap ke bawah".
 
-     Root menelan semua sentuhan (ketuk area kosong TIDAK menutup — sama
-     seperti Google); menutup hanya lewat tombol ✕, usap ke bawah, atau
-     AVI tidur sendiri saat hening.-->
+     Mesin menyala otomatis begitu panel tergambar (mic langsung
+     siap mendengarkan — Task 17); tanpa izin mic, pill ketik tetap
+     hidup. Root menelan sentuhan kosong = tutup.-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/akarSesi"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EC0B1220"
+    android:background="#4D070F0C"
     android:clickable="true"
     android:focusable="true">
 
-    <!-- ===== greeting kiri atas ala "Hi, how can I help?" ===== -->
+    <!-- ===== jawaban AVI: melayang, menempel di atas pill ===== -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="26dp"
-        android:paddingRight="66dp"
-        android:paddingTop="46dp">
+        android:gravity="bottom"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="92dp">
 
-        <TextView
-            android:id="@+id/tvSapa"
+        <LinearLayout
+            android:id="@+id/barisJawabanSesi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Hai!"
-            android:textColor="@color/sesi_teks"
-            android:textSize="24sp"
-            android:textStyle="bold"/>
+            android:orientation="horizontal"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tvSub"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="Ada yang bisa saya bantu?"
-            android:textColor="@color/sesi_samping"
-            android:textSize="14sp"/>
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="3dp"
+                android:src="@drawable/logo_avi"
+                android:contentDescription="AVI"/>
+
+            <TextView
+                android:id="@+id/tvAviSesi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:textColor="#F2F7F5"
+                android:textSize="15sp"
+                android:lineSpacingMultiplier="1.35"
+                android:shadowColor="#A6070F0C"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:maxLines="12"
+                android:ellipsize="end"/>
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- tombol tutup kecil kanan atas -->
-    <FrameLayout
-        android:id="@+id/btnTutupSesi"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="top|end"
-        android:layout_marginTop="34dp"
-        android:layout_marginRight="22dp"
-        android:background="@drawable/pil_tutup"
-        android:contentDescription="Tutup">
-
-        <ImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_tutup"
-            android:contentDescription=""/>
-    </FrameLayout>
-
-    <!-- ===== transkrip + jawaban: teks polos kiri tengah ===== -->
+    <!-- ===== bar bawah: pill "Tanya AVI…" + tombol suara ===== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:orientation="vertical"
-        android:paddingLeft="26dp"
-        android:paddingRight="26dp">
-
-        <TextView
-            android:id="@+id/tvAndaSesi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:textColor="#FFFFFF"
-            android:textSize="19sp"
-            android:textStyle="bold"
-            android:lineSpacingMultiplier="1.2"
-            android:maxLines="3"
-            android:ellipsize="end"/>
-
-        <TextView
-            android:id="@+id/tvAviSesi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:visibility="gone"
-            android:textColor="#DCE7F8"
-            android:textSize="15sp"
-            android:lineSpacingMultiplier="1.35"
-            android:maxLines="8"
-            android:ellipsize="end"/>
-    </LinearLayout>
-
-    <!-- ===== bar bawah: 4 titik AVI + status ===== -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
+        android:layout_gravity="bottom"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingLeft="26dp"
-        android:paddingRight="26dp"
-        android:paddingBottom="44dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="20dp">
 
-        <com.avi.assistant.TitikEmpat
-            android:id="@+id/titikSesi"
-            android:layout_width="64dp"
-            android:layout_height="26dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_pil_sesi"
+            android:paddingLeft="18dp"
+            android:paddingRight="6dp">
 
-        <TextView
-            android:id="@+id/tvStatusSesi"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="14dp"
-            android:textAllCaps="true"
-            android:letterSpacing="0.12"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="@color/sesi_aksen"
-            android:textSize="11sp"
-            android:textStyle="bold"/>
+            <EditText
+                android:id="@+id/etPilSesi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Tanya AVI…"
+                android:textColor="#F2F7F5"
+                android:textColorHint="#A8F2F7F5"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:inputType="text"
+                android:imeOptions="actionSend"
+                android:importantForAutofill="no"
+                android:contentDescription="Ketik pertanyaan untuk AVI"/>
+
+            <FrameLayout
+                android:id="@+id/bSuaraSesi"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="6dp"
+                android:background="@drawable/bg_tombol_suara"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Tombol voice">
+
+                <ImageView
+                    android:id="@+id/ikonSuaraSesi"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_mic"
+                    android:tint="#2DD4BF"
+                    android:contentDescription=""/>
+            </FrameLayout>
+        </LinearLayout>
     </LinearLayout>
-
-    <!-- petunjuk halus -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="12dp"
-        android:text="Usap ke bawah untuk menutup"
-        android:textColor="@color/sesi_samping"
-        android:textSize="10sp"
-        android:letterSpacing="0.05"/>
 </FrameLayout>

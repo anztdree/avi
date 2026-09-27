@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ===================== LAYAR UTAMA "AVI Arc" =====================
-     Struktur baru total (bukan aplikasi chat biasa):
-     - Bar atas: avatar orb mini + wordmark + titik status + tombol ikon bulat
-     - Hero: orb besar bernapas + salam besar + KISI KARTU SARAN 2x2
+<!-- ===================== LAYAR UTAMA "AVI Arc" v1.2 =====================
+     Diringkas mengikuti kalibrasi web (Task 11, "efisien yg utama"):
+     - Hero: logo 4 titik STATIS (nol animasi) + salam + satu ajakan —
+       TANPA orb 136dp bernapas, TANPA kisi kartu saran 2x2.
      - Obrolan: gelembung AVI beravatar kiri / pil gradasi user kanan
      - Input: pil kaca melayang + tombol aksi gradasi
 ==================================================================== -->
@@ -64,9 +64,11 @@
         android:paddingTop="20dp" android:paddingBottom="12dp"
         android:paddingLeft="20dp" android:paddingRight="20dp">
 
-        <com.avi.assistant.OrbView
-            android:id="@+id/orbHero"
-            android:layout_width="136dp" android:layout_height="136dp"/>
+        <ImageView
+            android:layout_width="64dp" android:layout_height="14dp"
+            android:layout_marginTop="34dp"
+            android:src="@drawable/logo_avi"
+            android:contentDescription="AVI"/>
 
         <TextView
             android:id="@+id/tvSalam"
@@ -82,83 +84,6 @@
             android:layout_marginTop="7dp"
             android:gravity="center"
             android:textColor="@color/avi_teks_samping" android:textSize="14sp"/>
-
-        <!-- kisi kartu saran 2 x 2 -->
-        <LinearLayout
-            android:id="@+id/barisChips"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="26dp">
-
-            <LinearLayout
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
-
-                <LinearLayout android:id="@+id/chip1" style="@style/KartuSaran">
-                    <ImageView
-                        android:layout_width="20dp" android:layout_height="20dp"
-                        android:src="@drawable/ic_saran_jam"
-                        android:contentDescription=""/>
-                    <TextView
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
-                        android:tag="teks"
-                        android:text="Buatkan alarm pagi"
-                        android:textColor="@color/avi_teks" android:textSize="13sp"/>
-                </LinearLayout>
-
-                <Space
-                    android:layout_width="12dp" android:layout_height="1dp"/>
-
-                <LinearLayout android:id="@+id/chip2" style="@style/KartuSaran">
-                    <ImageView
-                        android:layout_width="20dp" android:layout_height="20dp"
-                        android:src="@drawable/ic_saran_lelucon"
-                        android:contentDescription=""/>
-                    <TextView
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
-                        android:tag="teks"
-                        android:text="Ceritakan lelucon singkat"
-                        android:textColor="@color/avi_teks" android:textSize="13sp"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout android:id="@+id/chip3" style="@style/KartuSaran">
-                    <ImageView
-                        android:layout_width="20dp" android:layout_height="20dp"
-                        android:src="@drawable/ic_saran_makan"
-                        android:contentDescription=""/>
-                    <TextView
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
-                        android:tag="teks"
-                        android:text="Ide menu makan malam"
-                        android:textColor="@color/avi_teks" android:textSize="13sp"/>
-                </LinearLayout>
-
-                <Space
-                    android:layout_width="12dp" android:layout_height="1dp"/>
-
-                <LinearLayout android:id="@+id/chip4" style="@style/KartuSaran">
-                    <ImageView
-                        android:layout_width="20dp" android:layout_height="20dp"
-                        android:src="@drawable/ic_saran_ai"
-                        android:contentDescription=""/>
-                    <TextView
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
-                        android:tag="teks"
-                        android:text="Jelaskan apa itu AI"
-                        android:textColor="@color/avi_teks" android:textSize="13sp"/>
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
     </LinearLayout>
 
     <!-- ==== riwayat obrolan ==== -->

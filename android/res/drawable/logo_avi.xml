@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- LOGO AVI — 4 titik Aurora (identitas sama dgn web: teal, hijau,
+     amber, ungu). GAMBAR STATIS total: nol animasi, nol redraw —
+     dipakai hero layar utama (pengganti orb 136dp bernapas) dan
+     baris jawaban panel asisten. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:left="0dp" android:top="2dp" android:bottom="2dp" android:right="54dp">
+        <shape android:shape="oval">
+            <solid android:color="#2DD4BF"/>
+            <size android:width="10dp" android:height="10dp"/>
+        </shape>
+    </item>
+    <item android:left="18dp" android:top="2dp" android:bottom="2dp" android:right="36dp">
+        <shape android:shape="oval">
+            <solid android:color="#34D399"/>
+            <size android:width="10dp" android:height="10dp"/>
+        </shape>
+    </item>
+    <item android:left="36dp" android:top="2dp" android:bottom="2dp" android:right="18dp">
+        <shape android:shape="oval">
+            <solid android:color="#FBBF24"/>
+            <size android:width="10dp" android:height="10dp"/>
+        </shape>
+    </item>
+    <item android:left="54dp" android:top="2dp" android:bottom="2dp" android:right="0dp">
+        <shape android:shape="oval">
+            <solid android:color="#A78BFA"/>
+            <size android:width="10dp" android:height="10dp"/>
+        </shape>
+    </item>
+</layer-list>

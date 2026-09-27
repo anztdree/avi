@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PIL "Tanya AVI…" panel asisten (b19) — pill gelap bulat penuh
+     dengan garis tipis, persis web: rgba(24,34,30,0.92) +
+     border rgba(255,255,255,0.10). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#EC181E1E"/>
+    <corners android:radius="26dp"/>
+    <stroke android:width="1dp" android:color="#1AFFFFFF"/>
+</shape>
