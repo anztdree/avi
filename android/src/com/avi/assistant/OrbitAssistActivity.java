@@ -44,8 +44,14 @@ import android.widget.TextView;
  *
  * Otomatis (Task 17): mesin menyala begitu panel tergambar — mic
  * langsung siap mendengarkan bila izin ada; tanpa izin mic, pill ketik
- * tetap hidup (teksManual). Tutup: ketuk area kosong / usap ke bawah /
- * AVI pamit. Barge-in: sentuh jawaban saat AVI bicara.
+ * tetap hidup (teksManual). Tutup: ketuk area kosong / usap ke bawah.
+ * Barge-in: sentuh jawaban saat AVI bicara.
+ *
+ * Baru b24 TINGKAT B (permintaan pemilik): WAKEUP VOICE — setelah AVI
+ * pamit panel TIDAK ditutup: mic menunggu sapa dalam keadaan tenang dan
+ * cukup ucapkan "Avi" untuk melanjutkan ngobrol tanpa tahan home lagi
+ * ("Avi jam berapa" bahkan langsung dijawab). Mengetik di pill juga
+ * membangunkan. Panel ditutup manual = benar-benar mati (nol mic).
  */
 public class OrbitAssistActivity extends Activity implements LiveEngine.Pendengar {
 

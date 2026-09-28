@@ -59,6 +59,19 @@ import java.util.Locale;
  * dijaga dari pembuatan ganda (bocor → saling BUSY), galat BUSY dihitung
  * dengan jeda menaik (dulu dibongkar-pasang tiap 400 ms tanpa ujung =
  * ponsel terasa berat), dan jeda dengar-ulang panel diberi napas 800 ms.
+ *
+ * b24 TINGKAT B (permintaan pemilik): WAKEUP VOICE "AVI" — setelah AVI
+ * pamit, panel jalur tombol TIDAK lagi ditutup. AVI pamit singkat, lalu
+ * mic menyala dalam mode MENUNGGU SAPA: keadaan tampil tetap TENANG
+ * (SIAP — pemilik belum dilayani), dan hanya kata bangun "Avi" yang
+ * diperhatikan. Terdengar "Avi" → panel langsung MENDENGARKAN penuh
+ * (pill "Mendengarkan…") TANPA tahan home lagi; terdengar "Avi jam
+ * berapa" → sapaan dibuang dan sisanya langsung DIJAWAB. Mengetik di
+ * pill juga membangunkan. Hening saat menunggu adalah kondisi normal —
+ * tidak ada hitungan tidur. Panel ditutup manual (ketuk kosong / usap)
+ * = benar-benar mati: nol mic, nol baterai — inilah arti "tidak bekerja
+ * 24 jam, siap di panggung jika diperlukan". Mode Live (tidurBilaSenyap
+ * = true) tetap pamit lalu tidur seperti dulu.
  */
 public class LiveEngine {
 
@@ -78,6 +91,11 @@ public class LiveEngine {
     private static final String ID_PAMIT = "pamit";
     private static final String TEKS_PAMIT =
             "Baik, AVI pamit dulu. Panggil AVI lagi kapan saja.";
+
+    // b24 Tingkat B: pamit di jalur panel — sesi tetap hidup menunggu sapa
+    private static final String ID_PAMIT_TUNGGU = "pamit_tunggu";
+    private static final String TEKS_PAMIT_TUNGGU =
+            "Baik, AVI pamit dulu. Bilang \u201CAvi\u201D kalau butuh saya lagi.";
 
     // ==== TTS hangat lintas sesi (perbaikan kelambatan b14) ====
  // Memuat TextToSpeech dari nol butuh 1-2 detik di HP low-RAM — dulunya
@@ -113,6 +131,8 @@ public class LiveEngine {
     private boolean bahasaDiberiTahu = false;  // pesan "suara Indonesia belum ada" sekali per sesi
     private boolean hidup = false;
     private boolean sudahTidur = false;
+    private boolean tungguSapa = false;   // b24 Tingkat B: panel menunggu
+                                          // kata bangun "Avi" (jalur panel)
     private boolean punyaPercakapan = false;
     private int salahDengar = 0;
     private int salahBusy = 0;   // b22: ERROR_RECOGNIZER_BUSY beruntun — dulu
@@ -159,6 +179,7 @@ public class LiveEngine {
 
     public void mulai() {
         hidup = true;
+        tungguSapa = false;   // b24: bukaan baru = langsung mendengarkan
         siapkanTts();
         if (pengenal == null) siapkanPengenal();   // b22: jangan membuat ganda
         if (!izinMicAda()) {
@@ -176,6 +197,7 @@ public class LiveEngine {
 
     public void hentikan() {
         hidup = false;
+        tungguSapa = false;
         handler.removeCallbacksAndMessages(null);
         if (gerbang != null) { gerbang.hentikan(); gerbang = null; }
         if (tts != null) {
@@ -371,6 +393,8 @@ public class LiveEngine {
         handler.post(() -> {
             if (!hidup) return;
             if (ID_PAMIT.equals(id)) { tidurSekarang(); return; }
+            // b24: pamit jalur panel selesai → mic menyala dalam mode tunggu
+            if (ID_PAMIT_TUNGGU.equals(id)) { dengarTungguSapa(); return; }
             if (id == null || !id.equals(idUcapTerakhir)) return;
             ttsSelesai = true;
             cobaLanjutDengar();
@@ -389,6 +413,7 @@ public class LiveEngine {
     public void potongTts() {
         if (!hidup || sudahTidur) return;
         sesi++;                        // buang seluruh callback giliran lama
+        tungguSapa = false;            // b24: memotong juga membangunkan
         if (tts != null) { try { tts.stop(); } catch (Exception ignored) {} }
         streamSelesai = true;
         ttsSelesai = true;
@@ -403,6 +428,7 @@ public class LiveEngine {
      *  dihitung sebagai verifikasi — pemilik jelas ada di depan layar). */
     public void dengarkanLagi() {
         if (!hidup || sudahTidur || keadaan != OrbView.SIAP) return;
+        tungguSapa = false;            // b24: sentuhan langsung membangunkan
         if (gerbang != null) { gerbang.hentikan(); gerbang = null; }
         lolosSampaiMs = System.currentTimeMillis();
         mulaiMendengarkan();
@@ -415,6 +441,7 @@ public class LiveEngine {
     public void teksManual(String teks) {
         String t = teks == null ? "" : teks.trim();
         if (t.isEmpty() || !hidup || sudahTidur) return;
+        tungguSapa = false;   // b24: mengetik juga membangunkan dari tunggu-sapa
         if (pengenal != null) {
             try { pengenal.cancel(); } catch (Exception ignored) {}
         }
@@ -591,7 +618,8 @@ public class LiveEngine {
             @Override public void onEvent(int eventType, Bundle params) {}
 
             @Override public void onPartialResults(Bundle parsial) {
-                if (!hidup || keadaan != OrbView.MENDENGARKAN) return;
+                if (!hidup || (keadaan != OrbView.MENDENGARKAN && !tungguSapa))
+                    return;   // b24: di tunggu-sapa parsial tetap tampil di pill
                 ArrayList<String> daftar = parsial
                         .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                 if (daftar != null && !daftar.isEmpty()
@@ -606,6 +634,29 @@ public class LiveEngine {
                         .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                 String teks = (daftar == null || daftar.isEmpty())
                         ? "" : daftar.get(0).trim();
+                if (tungguSapa) {
+                    // b24 TINGKAT B: di keadaan tunggu hanya kata bangun
+                    // "Avi" yang diperhatikan. "Avi" telanjang → langsung
+                    // MENDENGARKAN penuh; "Avi jam berapa" → sapaan dibuang,
+                    // sisanya langsung dijawab.
+                    if (mengandungAvi(teks)) {
+                        String sisa = buangSapa(teks);
+                        tungguSapa = false;
+                        hitungHening = 0;
+                        if (sisa.isEmpty()) {
+                            p.transkripAnda("");
+                            p.teksAvi("");
+                            jadwalMendengarkan(150);
+                        } else {
+                            p.transkripAnda(teks);
+                            ajukanKeAi(sisa);
+                        }
+                    } else {
+                        p.transkripAnda("");       // bersihkan parsial yang
+                        jadwalMendengarkan(150);   // menggantung — tetap menunggu
+                    }
+                    return;
+                }
                 if (teks.isEmpty()) { jadwalMendengarkan(150); return; }
                 p.transkripAnda(teks);
                 hitungHening = 0;          // ada suara — penghitung hening direset
@@ -614,6 +665,25 @@ public class LiveEngine {
 
             @Override public void onError(int error) {
                 if (!hidup || sudahTidur) return;
+                if (tungguSapa) {
+                    // b24: di keadaan tunggu-sapa, hening adalah kondisi
+                    // NORMAL — dengar lagi terus sampai "Avi" terdengar
+                    // atau panel ditutup manual (tanpa hitungan tidur)
+                    if (error == SpeechRecognizer.ERROR_RECOGNIZER_BUSY) {
+                        if (++salahBusy >= 5) jadwalMendengarkan(5000);
+                        else bangunUlangPengenal(400 * salahBusy);
+                        return;
+                    }
+                    if (error == SpeechRecognizer.ERROR_AUDIO
+                            || error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) {
+                        p.status("Mikrofon bermasalah — AVI tidur dulu, "
+                                + AviBrain.namaPemilik(ctx) + ".");
+                        tidurSekarang();
+                        return;
+                    }
+                    jadwalMendengarkan(150);
+                    return;
+                }
                 if (error == SpeechRecognizer.ERROR_NO_MATCH
                         || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
                     // IDLE — pola Siri/GA: beberapa detik tanpa aktivitas, tidur.
@@ -671,8 +741,15 @@ public class LiveEngine {
         if (!hidup || sudahTidur) return;
         if (pengenal == null) siapkanPengenal();
         if (pengenal == null) return;
-        setKeadaan(OrbView.MENDENGARKAN);
-        p.status("Mendengarkan… bicara saja, " + AviBrain.namaPemilik(ctx));
+        if (tungguSapa) {
+            // b24: mic menyala dalam MODE TUNGGU — tampilan tetap TENANG
+            // (SIAP); pill "Mendengarkan…" baru setelah "Avi" terdengar
+            setKeadaan(OrbView.SIAP);
+            p.status("Menunggu \u201CAvi\u201D — ucapkan untuk melanjutkan.");
+        } else {
+            setKeadaan(OrbView.MENDENGARKAN);
+            p.status("Mendengarkan… bicara saja, " + AviBrain.namaPemilik(ctx));
+        }
         Intent it = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         it.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -710,17 +787,65 @@ public class LiveEngine {
 
     // ==================== idle → tidur (pola Siri/GA) ====================
 
-    /** Hening ±5 detik setelah percakapan: pamit singkat, lalu tidur. */
+    /** Hening ±5 detik setelah percakapan: pamit singkat, lalu tidur
+     *  (Mode Live) atau MENUNGGU SAPA "Avi" (jalur panel — b24). */
     private void mulaiPamit() {
         if (sudahTidur) return;
-        setKeadaan(OrbView.SIAP);
-        p.status("AVI istirahat — sesi berakhir karena hening.");
-        p.transkripAnda("");
-        if (ttsSiap && tts != null) {
-            tts.speak(TEKS_PAMIT, TextToSpeech.QUEUE_ADD, null, ID_PAMIT);
+        hitungHening = 0;
+        if (tidurBilaSenyap) {
+            // Mode Live (pola Siri/GA): pamit lalu sesi ditutup
+            setKeadaan(OrbView.SIAP);
+            p.status("AVI istirahat — sesi berakhir karena hening.");
+            p.transkripAnda("");
+            if (ttsSiap && tts != null) {
+                tts.speak(TEKS_PAMIT, TextToSpeech.QUEUE_ADD, null, ID_PAMIT);
+            }
+            // pengaman: meski onDone TTS tidak datang, tetap tidur tepat waktu
+            handler.postDelayed(this::tidurSekarang, 4500);
+            return;
         }
-        // pengaman: meski onDone TTS tidak datang, tetap tidur tepat waktu
-        handler.postDelayed(this::tidurSekarang, 4500);
+        // b24 TINGKAT B (permintaan pemilik): panel TIDAK ditutup — "terasa
+        // tidur tapi sesi masih hidup". AVI pamit singkat, lalu mic menyala
+        // dalam mode MENUNGGU SAPA: cukup ucapkan "Avi" untuk melanjutkan
+        // tanpa tahan home lagi. Panel ditutup manual = benar-benar mati.
+        tungguSapa = true;
+        setKeadaan(OrbView.SIAP);
+        p.status("Menunggu sapa — ucapkan \u201CAvi\u201D untuk melanjutkan.");
+        p.transkripAnda("");
+        p.teksAvi("AVI istirahat. Ucapkan \u201CAvi\u201D untuk melanjutkan "
+                + "ngobrol — atau ketik saja di pill.");
+        if (ttsSiap && tts != null) {
+            tts.speak(TEKS_PAMIT_TUNGGU, TextToSpeech.QUEUE_ADD, null,
+                    ID_PAMIT_TUNGGU);
+        }
+        // pengaman: meski onDone TTS tak datang, mic tunggu-sapa tetap nyala
+        handler.removeCallbacks(tungguSapaMulai);
+        handler.postDelayed(tungguSapaMulai, 4500);
+    }
+
+    private final Runnable tungguSapaMulai = this::dengarTungguSapa;
+
+    /** b24: TTS pamit beres → mic menyala dalam mode tunggu (keadaan tampil
+     *  tetap SIAP — tenang; "Mendengarkan…" baru setelah "Avi" terdengar). */
+    private void dengarTungguSapa() {
+        handler.removeCallbacks(tungguSapaMulai);
+        if (!hidup || sudahTidur || !tungguSapa) return;
+        if (tts != null) { try { tts.stop(); } catch (Exception ignored) {} }
+        jadwalMendengarkan(300);   // gema TTS meluruh dulu (anti-echo)
+    }
+
+    /** b24: kata bangun — "avi" berdiri sendiri (bukan potongan kata lain;
+     *  "savi" / "avi123" tidak menghitung). */
+    private static boolean mengandungAvi(String teks) {
+        return teks != null
+                && teks.toLowerCase(Locale.ROOT).matches(".*\\bavi\\b.*");
+    }
+
+    /** b24: buang sapaan "Avi" di AWAL ucapan — "Avi jam berapa" →
+     *  "jam berapa". "Avi" di tengah kalimat dibiarkan utuh (mis.
+     *  "siapa itu Avi" tetap jadi pertanyaan yang benar). */
+    private static String buangSapa(String teks) {
+        return teks.replaceFirst("(?i)^\\s*avi\\b[\\s,:;.!?-]*", "").trim();
     }
 
     private void tidurSekarang() {

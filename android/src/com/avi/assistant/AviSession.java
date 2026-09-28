@@ -50,7 +50,13 @@ import android.widget.TextView;
  * Kata-kata pemilik hidup DI DALAM pill (bicara maupun ketik) dan hilang
  * sendiri saat giliran tuntas. Mesin menyala otomatis begitu sesi
  * tergambar — mic langsung siap mendengarkan; tanpa izin mic, pill ketik
- * tetap hidup. Menutup: ketuk area kosong, usap ke bawah, atau AVI pamit.
+ * tetap hidup. Menutup: ketuk area kosong atau usap ke bawah.
+ *
+ * Baru b24 TINGKAT B (permintaan pemilik): WAKEUP VOICE — setelah AVI
+ * pamit panel TIDAK ditutup: mic menunggu sapa dalam keadaan tenang dan
+ * cukup ucapkan "Avi" untuk melanjutkan ngobrol tanpa tahan home lagi
+ * ("Avi jam berapa" bahkan langsung dijawab). Mengetik di pill juga
+ * membangunkan. Panel ditutup manual = benar-benar mati (nol mic).
  */
 public class AviSession extends VoiceInteractionSession implements LiveEngine.Pendengar {
 
