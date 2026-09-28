@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SESI ASISTEN AVI v1.4 (b21) — PANEL GOOGLE MURNI, disetujui
+<!-- SESI ASISTEN AVI v1.6 (b23) — PANEL ASISTEN MURNI, disetujui
      pemilik lewat kalibrasi visual web (Task 13-17):
 
      Yang ADA (persis web yang disetujui):
      - layar belakang HANYA disentuh redup tipis 0,30 (#4D070F0C —
        nyaris terang; app di belakang jelas terlihat);
-     - jawaban AVI melayang di ATAS pill, logo 4 titik di kirinya,
-       teks diberi BAYANGAN (pola subtitle) agar terbaca di tema
-       cerah maupun gelap — TANPA menutup layar;
+     - jawaban AVI melayang di ATAS pill dalam BUBBLE
      - SATU bar di bawah: pill "Tanya AVI…" + tombol suara;
      - KATA-KATA PEMILIK (bicara maupun ketik) tampil DI DALAM pill,
        hilang sendiri saat giliran tuntas (pola web Task 15);
@@ -32,6 +30,10 @@
      (2) izin mic DIMINTA seketika panel terbuka, dan begitu
      diberikan mic langsung menyala tanpa disentuh; (3) panel tak
      tidur sendiri saat hening — terus mendengar (pola web b19).
+
+     Baru b23 (laporan pemilik): LOGO 4 TITIK di sisi kiri bubble
+     jawaban DIHAPUS TOTAL — "kita bukan Google". Baris jawaban
+     kini murni bubble; kata TANPA lambang apa pun.
 
      Mesin menyala otomatis begitu panel tergambar (mic langsung
      siap mendengarkan — Task 17); tanpa izin mic, pill ketik tetap
@@ -70,19 +72,13 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="3dp"
-                android:src="@drawable/logo_avi"
-                android:contentDescription="AVI"/>
-
+            <!-- b23: logo 4 titik dihapus (pemilik: "kita bukan
+                 Google") — baris jawaban murni bubble -->
             <TextView
                 android:id="@+id/tvAviSesi"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginLeft="10dp"
                 android:textColor="#F2F7F5"
                 android:textSize="15sp"
                 android:lineSpacingMultiplier="1.35"
