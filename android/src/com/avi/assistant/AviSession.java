@@ -42,6 +42,11 @@ import android.widget.TextView;
  * diberikan mic menyala sendiri; panel TAK tidur sendiri saat hening
  * (tidurBilaSenyap=false — terus mendengar sampai ditutup manual).
  *
+ * Baru b22 (laporan pemilik): panel tombol TIDAK LAGI menjalankan gerbang
+ * verifikasi "Hai AVI" (lewatiGerbang — ucapan pertama dimakan gerbang,
+ * AVI terasa tuli ±30 dtk; pola Google: tombol fisik = langsung dengar),
+ * dan mesin dijaga dari churn recognizer (sumber rasa berat).
+ *
  * Kata-kata pemilik hidup DI DALAM pill (bicara maupun ketik) dan hilang
  * sendiri saat giliran tuntas. Mesin menyala otomatis begitu sesi
  * tergambar — mic langsung siap mendengarkan; tanpa izin mic, pill ketik
@@ -61,6 +66,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     private int keadaan = OrbView.SIAP;
     private boolean micSip = true;
     private boolean transkripDiPil = false;
+    private boolean izinDiminta = false;   // b22: cegah activity izin buka ulang
 
     public AviSession(Context context) {
         super(context);
@@ -153,6 +159,9 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             micSip = mesin.izinMicAda();
             perbaruiTombol();
             mesin.tidurBilaSenyap = false;   // b21: panel terus mendengar
+            // b22: panel dibuka lewat TOMBOL = langsung dengar tanpa
+            // gerbang sapa — dulu ucapan pertama dimakan verifikasi
+            mesin.lewatiGerbang = true;
             mesin.mulai();
             // b21: izin mic belum ada? MINTA SEKARANG — dulu tidak ada
             // satu pun yang meminta, mesin mati diam tanpa pesan
@@ -164,7 +173,9 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
      *  (VoiceInteractionSession tak bisa requestPermissions).
      *  Begitu diberikan, dengaran langsung nyala tanpa disentuh. */
     private void mintaIzinMic() {
-        try {
+        if (izinDiminta) return;   // b22: onShow bisa terulang dalam satu
+        izinDiminta = true;        // bukaan — jangan buka activity izin
+        try {                      // berulang-ulang (berat, kedip-b kedip)
             MintaIzinMicActivity.saatDiizinkan = () -> {
                 if (mesin == null || akar == null) return;
                 micSip = mesin.izinMicAda();

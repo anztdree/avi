@@ -50,6 +50,15 @@ import java.util.Locale;
  * Mesin ini netral UI: dipakai LiveActivity (layar penuh) dan AviSession
  * (overlay transparan asisten perangkat). Host hanya menerima peristiwa
  * lewat Pendengar — semua callback datang di thread utama.
+ *
+ * b22 (laporan pemilik): panel yang dibuka lewat TOMBOL (tahan home /
+ * ACTION_ASSIST) TIDAK LAGI menjalankan gerbang sapa (lewatiGerbang=true)
+ * — dulu ucapan pertama dimakan gerbang sehingga AVI terasa tuli ±30 dtk;
+ * pola Google: Voice Match hanya untuk hotword, tombol fisik = langsung
+ * dengar. Mode Live tetap memakai gerbang. Ditambah: pengenal suara
+ * dijaga dari pembuatan ganda (bocor → saling BUSY), galat BUSY dihitung
+ * dengan jeda menaik (dulu dibongkar-pasang tiap 400 ms tanpa ujung =
+ * ponsel terasa berat), dan jeda dengar-ulang panel diberi napas 800 ms.
  */
 public class LiveEngine {
 
@@ -106,6 +115,10 @@ public class LiveEngine {
     private boolean sudahTidur = false;
     private boolean punyaPercakapan = false;
     private int salahDengar = 0;
+    private int salahBusy = 0;   // b22: ERROR_RECOGNIZER_BUSY beruntun — dulu
+                                 // TIDAK dihitung → destroy/create tiap 400 ms
+                                 // SELAMANYA bila layanan lambat melepas mic
+                                 // (= berat + mic tetap tuli)
     private int hitungHening = 0;         // berapa laporan hening berturut-turut
     private int keadaan = OrbView.SIAP;
 
@@ -136,17 +149,24 @@ public class LiveEngine {
      *  Mode Live lama (tidur saat hening, pola Siri/GA). */
     public boolean tidurBilaSenyap = true;
 
+    /** b22: true = panel tombol (tahan home / ASSIST) LANGSUNG mendengarkan
+     *  tanpa gerbang sapa — dulu gerbang memakan ucapan pertama (AVI terasa
+     *  tuli hingga ±30 dtk). Default false = Mode Live tetap memverifikasi
+     *  "Hai AVI" dulu (pola Voice Match). */
+    public boolean lewatiGerbang = false;
+
     // ============================ siklus hidup ============================
 
     public void mulai() {
         hidup = true;
         siapkanTts();
-        siapkanPengenal();
+        if (pengenal == null) siapkanPengenal();   // b22: jangan membuat ganda
         if (!izinMicAda()) {
             p.status("Izin mikrofon belum ada — berikan lewat Pengaturan ponsel.");
             return;
         }
-        if (GerbangSapa.aktif(ctx)
+        // b22: lewatiGerbang = panel tombol → langsung mendengarkan
+        if (!lewatiGerbang && GerbangSapa.aktif(ctx)
                 && System.currentTimeMillis() - lolosSampaiMs > USIA_VERIFIKASI_MS) {
             jalankanGerbang();
             return;
@@ -551,13 +571,19 @@ public class LiveEngine {
     // ==================== STT (mendengarkan) ====================
 
     private void siapkanPengenal() {
+        if (pengenal != null) return;   // b22: dulu createSpeechRecognizer
+                                        // lagi tanpa destroy yang lama →
+                                        // bocor + dua pengenal saling BUSY
         if (!SpeechRecognizer.isRecognitionAvailable(ctx)) {
             p.status("Pengenalan suara tidak tersedia di ponsel ini.");
             return;
         }
         pengenal = SpeechRecognizer.createSpeechRecognizer(ctx);
         pengenal.setRecognitionListener(new RecognitionListener() {
-            @Override public void onReadyForSpeech(Bundle params) { salahDengar = 0; }
+            @Override public void onReadyForSpeech(Bundle params) {
+                salahDengar = 0;
+                salahBusy = 0;   // b22: sesi baru sehat — hitungan direset
+            }
             @Override public void onBeginningOfSpeech() {}
             @Override public void onRmsChanged(float rmsdB) { if (hidup) p.rms(rmsdB); }
             @Override public void onBufferReceived(byte[] buffer) {}
@@ -605,14 +631,22 @@ public class LiveEngine {
                         // b21 (pola web b19): panel tetap terbuka — terus
                         // mendengar tanpa disuruh; ditutup manual saja
                         p.status("Masih mendengarkan — panel tetap terbuka…");
-                        jadwalMendengarkan(200);
+                        jadwalMendengarkan(800);   // b22: beri napas layanan
                         return;
                     }
                     mulaiPamit();
                     return;
                 }
                 if (error == SpeechRecognizer.ERROR_RECOGNIZER_BUSY) {
-                    bangunUlangPengenal(400);
+                    // b22: eskalasi 400/800/1200/1600 ms; lima beruntun =
+                    // layanan sedang sibuk → jeda panjang TANPA membunuh
+                    // recognizer (dulu dibongkar-pasang tiap 400 ms
+                    // selamanya → ponsel terasa berat, mic tetap tuli)
+                    if (++salahBusy >= 5) {
+                        jadwalMendengarkan(5000);
+                    } else {
+                        bangunUlangPengenal(400 * salahBusy);
+                    }
                     return;
                 }
                 salahDengar++;
@@ -667,7 +701,10 @@ public class LiveEngine {
                 pengenal = null;
             }
             siapkanPengenal();
-            mulaiMendengarkan();
+            // b22: mulaiMendengarkan() jalan 250 ms kemudian — bind layanan
+            // pengenalan itu async; start seketika setelah create sempat
+            // gugur diam di HP lambat (mic terlihat hidup tapi tuli)
+            jadwalMendengarkan(250);
         }, delayMs);
     }
 

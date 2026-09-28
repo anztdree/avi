@@ -37,6 +37,11 @@ import android.widget.TextView;
  * DIMINTA seketika panel terbuka dan begitu diberikan mic menyala
  * sendiri; panel TAK tidur sendiri saat hening (tidurBilaSenyap=false).
  *
+ * Baru b22 (laporan pemilik): panel tombol TIDAK LAGI menjalankan gerbang
+ * verifikasi "Hai AVI" (lewatiGerbang — ucapan pertama dimakan gerbang,
+ * AVI terasa tuli ±30 dtk; pola Google: tombol fisik = langsung dengar),
+ * dan mesin dijaga dari churn recognizer (sumber rasa berat).
+ *
  * Otomatis (Task 17): mesin menyala begitu panel tergambar — mic
  * langsung siap mendengarkan bila izin ada; tanpa izin mic, pill ketik
  * tetap hidup (teksManual). Tutup: ketuk area kosong / usap ke bawah /
@@ -139,6 +144,9 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
                 micSip = mesin.izinMicAda();
                 perbaruiTombol();
                 mesin.tidurBilaSenyap = false;   // b21: panel terus mendengar
+                // b22: panel dibuka lewat TOMBOL = langsung dengar tanpa
+                // gerbang sapa — dulu ucapan pertama dimakan verifikasi
+                mesin.lewatiGerbang = true;
                 mesin.mulai();          // OTOMATIS siap mendengarkan
                 // b21: izin mic belum ada? MINTA SEKARANG — dulu tidak
                 // ada satu pun yang meminta, mesin mati diam tanpa pesan
