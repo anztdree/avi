@@ -17,6 +17,11 @@ import android.service.voice.VoiceInteractionService;
 public class AviVoiceInteractionService extends VoiceInteractionService {
     @Override
     public void onReady() {
-        // sengaja kosong: tanpa hotword detector — pemicu murni lewat sistem.
+        // v2.2: sistem mem-binding service ini selama AVI jadi asisten.
+        // Setiap kali binding hidup (termasuk setelah sistem mematikan
+        // lalu merebut-lagi), penjaga proses ikut bangkit — loop
+        // penyembuh diri: proses tidak pernah dingin lagi, panel
+        // tahan-home selalu muncul seketika.
+        LayananJaga.nyalakan(this);
     }
 }
