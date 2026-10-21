@@ -122,6 +122,63 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- ==== v2.4 kartu IZIN & KESEHATAN AVI — satu layar diagnosis:
+         jalur asisten, izin mikrofon, penjaga, baterai. Ketuk baris ✘
+         = langsung perbaiki. Kartu menyembunyikan diri bila semua ✔.
+         Meluruskan anggapan "ini masalah izin" pemilik: bila lingkaran
+         putih masih tampil, baris inilah yang menunjukkan izin/peran
+         mana yang belum pas. ==== -->
+    <LinearLayout
+        android:id="@+id/kartuKesehatan"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/card_settings"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/kesehatan_judul"
+            android:textColor="@color/aksen" android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.06"/>
+
+        <TextView
+            android:id="@+id/rowJalur"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingTop="9dp" android:paddingBottom="9dp"
+            android:textColor="@color/avi_teks" android:textSize="13sp"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/rowMic"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingTop="9dp" android:paddingBottom="9dp"
+            android:textColor="@color/avi_teks" android:textSize="13sp"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/rowJaga"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingTop="9dp" android:paddingBottom="9dp"
+            android:textColor="@color/avi_teks" android:textSize="13sp"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/rowBaterai"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingTop="9dp" android:paddingBottom="9dp"
+            android:textColor="@color/avi_teks" android:textSize="13sp"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:text="@string/kesehatan_ketuk"
+            android:textColor="@color/avi_teks_samping" android:textSize="11sp"/>
+    </LinearLayout>
+
     <!-- ==== hero (hanya saat obrolan kosong) ==== -->
     <LinearLayout
         android:id="@+id/heroBox"

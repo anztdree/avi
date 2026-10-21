@@ -39,4 +39,7 @@
     <color name="sesi_kartu">#C30E1A30</color>
     <color name="sesi_garis">#265EC8F8</color>
     <color name="sesi_pil">#B30E1A30</color>
+
+    <!-- v2.4 ARK REACTOR: label keadaan di bawah reaktor -->
+    <color name="sesi_keadaan">#9FB4D0</color>
 </resources>

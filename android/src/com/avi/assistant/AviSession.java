@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionSession;
 import android.text.Editable;
@@ -19,8 +18,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -64,6 +61,12 @@ import android.widget.TextView;
  * v2.0 (review pemilik: "sisa bulat-bulat... hapus napa biar bersih"):
  * ORB di panel DIHAPUS — panel kini lembar JARVIS bersih: bubble
  * jawaban + pill + tombol suara, tanpa satu pun ornamen bulat.
+ *
+ * v2.4 TEMA BARU "ARK REACTOR" (pilihan pemilik): panel transparan +
+ * reaktor tengah + label keadaan; NAVBAR TIDAK LAGI disembunyikan —
+ * koreksi pemilik: "saat tombol home ditekan navigasi tidak boleh
+ * disembunyikan". sembunyikanBarSistem() v2.1 dihapus total; bar
+ * bawah menghormati tinggi navbar lewat inset sistem.
  */
 public class AviSession extends VoiceInteractionSession implements LiveEngine.Pendengar {
 
@@ -76,6 +79,8 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     private LiveEngine mesin;
     private GestureDetector usap;
     private ObjectAnimator denyut;
+    private OrbView orb;          // v2.4: reaktor tengah
+    private TextView tvKeadaan;   // v2.4: label keadaan reaktor
     private int keadaan = OrbView.SIAP;
     private boolean micSip = true;
     private boolean transkripDiPil = false;
@@ -93,7 +98,11 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
         ikonSuara = akar.findViewById(R.id.ikonSuaraSesi);
         bSuara = akar.findViewById(R.id.bSuaraSesi);
         tvAvi = akar.findViewById(R.id.tvAviSesi);
-        // v2.0: orb dihapus dari panel (pemilik: "biar bersih")
+        // v2.4: reaktor tengah + label keadaan (tema ARK REACTOR)
+        orb = akar.findViewById(R.id.orbSesi);
+        tvKeadaan = akar.findViewById(R.id.tvKeadaanSesi);
+        orb.setGradienGoogle(true);
+        perbaruiKeadaan(keadaan);
 
         // usap ke bawah = tutup; ketukan biasa diteruskan ke onClick akar
         // = KETUK AREA KOSONG = tutup (pola web disetujui)
@@ -158,16 +167,9 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
 
-        // v2.1: navbar disembunyikan selama panel terbuka — area tombol
-        // home (tempat badge lingkaran putih sistem menempel) hilang dari
-        // pandangan; panel terasa penuh layar ala Google Assistant.
-        // Sesi tak punya callback fokus → sembunyikan berulang (murah).
-        sembunyikanBarSistem();
-        if (akar != null) {
-            akar.post(this::sembunyikanBarSistem);
-            akar.postDelayed(this::sembunyikanBarSistem, 250L);
-            akar.postDelayed(this::sembunyikanBarSistem, 900L);
-        }
+        // v2.4 (koreksi pemilik): navbar TIDAK boleh disembunyikan —
+        // perilaku v2.1 dihapus; konten menghormati navbar lewat inset
+        pasangInsetBawah();
 
         // satu animasi pendek saja — sesi muncul nyaris seketika
         if (akar != null) {
@@ -194,25 +196,34 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
         });
     }
 
-    /** v2.1: bar navigasi disembunyikan (IMMERSIVE_STICKY) selama panel
-     *  AVI terbuka. Sapu dari bawah memunculkannya sesaat tanpa
-     *  mengguncang layout. Tutup panel tetap: ketuk kosong / usap bawah. */
-    private void sembunyikanBarSistem() {
-        Dialog jendela = getWindow();
-        if (jendela == null || jendela.getWindow() == null) return;
-        View d = jendela.getWindow().getDecorView();
-        if (Build.VERSION.SDK_INT >= 30) {
-            WindowInsetsController c = d.getWindowInsetsController();
-            if (c != null) {
-                c.hide(WindowInsets.Type.navigationBars());
-                c.setSystemBarsBehavior(WindowInsetsController
-                        .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } else {
-            d.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    /** v2.4: bar bawah + zona jawaban menaikkan padding sebanyak tinggi
+     *  navbar — panel tetap manis di atas tombol navigasi yang TAMPIL. */
+    private void pasangInsetBawah() {
+        if (akar == null) return;
+        final View bar = akar.findViewById(R.id.barBawahSesi);
+        final View zona = akar.findViewById(R.id.zonaJawabanSesi);
+        final int dasarBar = bar != null ? bar.getPaddingBottom() : 0;
+        final int dasarZona = zona != null ? zona.getPaddingBottom() : 0;
+        akar.setOnApplyWindowInsetsListener((v, insets) -> {
+            int bawah = insets.getSystemWindowInsetBottom();
+            if (bar != null) bar.setPadding(
+                    bar.getPaddingLeft(), bar.getPaddingTop(),
+                    bar.getPaddingRight(), dasarBar + bawah);
+            if (zona != null) zona.setPadding(
+                    zona.getPaddingLeft(), zona.getPaddingTop(),
+                    zona.getPaddingRight(), dasarZona + bawah);
+            return insets;
+        });
+    }
+
+    /** v2.4: cermin keadaan mesin ke reaktor + label keadaan. */
+    private void perbaruiKeadaan(int k) {
+        if (orb != null) orb.setKeadaan(k);
+        if (tvKeadaan != null) {
+            tvKeadaan.setText(k == OrbView.MENDENGARKAN ? R.string.keadaan_mendengar
+                    : k == OrbView.BERPIKIR ? R.string.keadaan_mikir
+                    : k == OrbView.BICARA ? R.string.keadaan_bicara
+                    : R.string.keadaan_siap);
         }
     }
 
@@ -320,6 +331,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
 
     @Override public void keadaan(int k) {
         keadaan = k;
+        perbaruiKeadaan(k);
         perbaruiTombol();
     }
 
@@ -354,8 +366,8 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     }
 
     @Override public void rms(float rmsdb) {
-        // v2.0: tanpa orb di panel — umpan balik dengar cukup dari
-        // denyut tombol mic dan hint "Mendengarkan…"
+        // v2.4: cincin reaktor ikut mengikuti kerasnya suara
+        if (orb != null) orb.setRms(rmsdb);
     }
 
     @Override public void tetidur() {

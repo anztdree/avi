@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ============ IKON ASSIST v2.4 "GARIS TIPIS MIRING" ==================
+     Amandemen pemilik: lingkaran putih kosong yang tertinggal sistem
+     saat tombol home ditahan jangan berupa kotak kosong — bila ROM
+     tetap menggambar badge, isinya kini GARIS TIPIS MIRING (bukan
+     putih penuh). Bila ROM menggambar ikon apa adanya (tanpa wadah),
+     badge yang terlihat tinggal garis tipis ini — nyaris tak kasat.
+     Jalur tanpa badge sama sekali = Mode Penuh (kartu di MainActivity).
+==================================================================== -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:pathData="M10,38 L38,10"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"/>
+</vector>

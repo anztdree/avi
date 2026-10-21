@@ -1,5 +1,6 @@
 package com.avi.assistant;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -54,6 +55,12 @@ public class MainActivity extends Activity {
     private LinearLayout kartuAsisten;
     private TextView tvAsistenJalur;
     private static final int MINTA_ROLE_ASISTEN = 771;
+
+    // v2.4: kartu IZIN & KESEHATAN AVI — satu layar diagnosis izin
+    // (anggapan pemilik: "ini masalah izin" — baris inilah jawabannya).
+    private LinearLayout kartuKesehatan;
+    private TextView rowJalur, rowMic, rowJaga, rowBaterai;
+    private static final int MINTA_IZIN_MIC = 772;
 
     // TTS mode chat: baca balasan AVI bila switch “Bacakan balasan” menyala
     private TextToSpeech tts;
@@ -137,6 +144,21 @@ public class MainActivity extends Activity {
         findViewById(R.id.btnBukaPengaturanAsisten)
                 .setOnClickListener(v -> bukaPengaturanAsisten());
         cekModeAsisten();
+
+        // v2.4: kartu IZIN & KESEHATAN — ketuk baris ✘ = perbaiki langsung
+        kartuKesehatan = findViewById(R.id.kartuKesehatan);
+        rowJalur    = findViewById(R.id.rowJalur);
+        rowMic      = findViewById(R.id.rowMic);
+        rowJaga     = findViewById(R.id.rowJaga);
+        rowBaterai  = findViewById(R.id.rowBaterai);
+        rowJalur.setOnClickListener(v -> aktifkanModePenuh());
+        rowMic.setOnClickListener(v -> mintaIzinMic());
+        rowJaga.setOnClickListener(v -> { LayananJaga.nyalakan(this); perbaruiKesehatan(); });
+        rowBaterai.setOnClickListener(v -> {
+            AviBrain.pref(this).edit().putBoolean("diminta_bebas_baterai", false).apply();
+            mintaBebasBaterai();
+        });
+        perbaruiKesehatan();
     }
 
     /** v2.1: Transsion/itel agresif mematikan proses latar — bila
@@ -176,9 +198,13 @@ public class MainActivity extends Activity {
             siapkanTts();
         }
         muatIsi();   // sesi Mode Live menulis ke riwayat — segarkan
+        // v2.4: penjaga ikut diperiksa tiap kembali ke layar ini — bila
+        // Mode Penuh baru saja aktif, penjaga (dan notifikasinya) pamit.
+        LayananJaga.nyalakan(this);
         // v2.3: pemilik baru kembali dari dialog peran / Pengaturan —
         // periksa lagi apakah jalur asisten sudah penuh.
         cekModeAsisten();
+        perbaruiKesehatan();
     }
 
     @Override
@@ -303,11 +329,64 @@ public class MainActivity extends Activity {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             boolean penuh = modeAsistenPenuh();
             cekModeAsisten();
+            perbaruiKesehatan();
             if (penuh) {
                 Toast.makeText(this, R.string.mode_asisten_sukses,
                         Toast.LENGTH_LONG).show();
             }
         }, 1200);
+    }
+
+    // ================= v2.4: izin & kesehatan AVI =================
+
+    /** Segarkan keempat baris diagnosis; kartu pamit bila semua ✔. */
+    private void perbaruiKesehatan() {
+        if (kartuKesehatan == null) return;
+        boolean penuh = modeAsistenPenuh();
+        boolean mic = checkSelfPermissionIzin();
+        boolean jaga = LayananJaga.JALAN;
+        boolean bebas = false;
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm != null) bebas = pm.isIgnoringBatteryOptimizations(getPackageName());
+
+        rowJalur.setText(penuh ? R.string.kesehatan_jalur_ok : R.string.kesehatan_jalur_no);
+        rowJalur.setTextColor(penuh ? 0xFF0F8A4B : 0xFFB4232A);
+        rowMic.setText(mic ? R.string.kesehatan_mic_ok : R.string.kesehatan_mic_no);
+        rowMic.setTextColor(mic ? 0xFF0F8A4B : 0xFFB4232A);
+        // Mode Penuh = penjaga tidak diperlukan (sistem menjaga proses)
+        if (penuh) {
+            rowJaga.setText(R.string.kesehatan_jaga_noping);
+            rowJaga.setTextColor(0xFF0F8A4B);
+        } else {
+            rowJaga.setText(jaga ? R.string.kesehatan_jaga_ok : R.string.kesehatan_jaga_no);
+            rowJaga.setTextColor(jaga ? 0xFF0F8A4B : 0xFFB4232A);
+        }
+        rowBaterai.setText(bebas ? R.string.kesehatan_baterai_ok
+                : R.string.kesehatan_baterai_no);
+        rowBaterai.setTextColor(bebas ? 0xFF0F8A4B : 0xFFB4232A);
+
+        boolean semuaBeres = penuh && mic && bebas;   // jaga tak wajib di Mode Penuh
+        kartuKesehatan.setVisibility(semuaBeres ? View.GONE : View.VISIBLE);
+    }
+
+    private boolean checkSelfPermissionIzin() {
+        if (Build.VERSION.SDK_INT < 23) return true;
+        return checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                == android.content.pm.PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void mintaIzinMic() {
+        if (Build.VERSION.SDK_INT < 23) return;
+        try {
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
+                    MINTA_IZIN_MIC);
+        } catch (Exception ignored) { }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int kode, String[] izin, int[] hasil) {
+        super.onRequestPermissionsResult(kode, izin, hasil);
+        if (kode == MINTA_IZIN_MIC) perbaruiKesehatan();
     }
 
     // ============================ tampilan ============================

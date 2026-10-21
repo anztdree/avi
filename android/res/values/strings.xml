@@ -11,6 +11,25 @@
     <string name="mode_asisten_tips">Kalau dialog tidak muncul atau lingkaran masih tampil: restart HP sekali (jalur diperbaiki otomatis saat menyala), atau buka Pengaturan → Aplikasi default → Asisten digital, pilih Tidak ada lalu pilih AVI lagi.</string>
     <string name="mode_asisten_jalur" formatted="false">Jalur aktif saat ini: %1$s</string>
     <string name="mode_asisten_sukses">Mode asisten penuh aktif — lingkaran putih tidak akan muncul lagi.</string>
+
+    <!-- v2.4: label keadaan reaktor ARK -->
+    <string name="keadaan_siap">Siap</string>
+    <string name="keadaan_mendengar">Mendengarkan…</string>
+    <string name="keadaan_mikir">Memproses…</string>
+    <string name="keadaan_bicara">AVI berbicara</string>
+
+    <!-- v2.4: kartu IZIN & KESEHATAN AVI -->
+    <string name="kesehatan_judul">Izin &amp; kesehatan AVI</string>
+    <string name="kesehatan_ketuk">Ketuk baris yang masih ✘ untuk memperbaiki.</string>
+    <string name="kesehatan_jalur_ok">Jalur asisten — PENUH, tanpa lingkaran putih</string>
+    <string name="kesehatan_jalur_no">Jalur asisten — activity, lingkaran putih masih mungkin</string>
+    <string name="kesehatan_mic_ok">Izin mikrofon — diizinkan</string>
+    <string name="kesehatan_mic_no">Izin mikrofon — belum diizinkan, suara mati</string>
+    <string name="kesehatan_jaga_ok">Penjaga kecepatan — aktif</string>
+    <string name="kesehatan_jaga_no">Penjaga kecepatan — mati, ketuk untuk menyalakan</string>
+    <string name="kesehatan_jaga_noping">Penjaga kecepatan — tidak diperlukan (Mode Penuh)</string>
+    <string name="kesehatan_baterai_ok">Baterai — bebas optimasi, tidak akan dibunuh sistem</string>
+    <string name="kesehatan_baterai_no">Baterai — masih dioptimasi sistem, penjaga bisa dimatikan</string>
     <string name="hint_nama_pemilik">Nama panggilan Anda, mis. Pak Budi / Sir</string>
-    <string name="versi" formatted="false">AVI v1.7 — b24: TINGKAT B WAKEUP VOICE (permintaan pemilik, dipilih dari rencana tiga tingkat). Setelah AVI pamit karena hening, panel TIDAK lagi ditutup: AVI pamit singkat, lalu mic menyala dalam mode MENUNGGU SAPA — keadaan tampil tetap tenang, dan cukup ucapkan "Avi" untuk melanjutkan ngobrol tanpa tahan home lagi. Lebih pintar lagi: ucapkan "Avi jam berapa" maka sapaan dibuang dan pertanyaannya langsung dijawab dalam satu napas. Mengetik di pill juga membangunkan, dan bubble menampilkan petunjuk "Ucapkan Avi untuk melanjutkan" saat AVI istirahat. Hening saat menunggu adalah kondisi normal tanpa hitungan tidur; panel ditutup manual (ketuk kosong atau usap ke bawah) = benar-benar mati, nol mic dan nol baterai — inilah arti "tidak bekerja 24 jam, siap di panggung jika diperlukan". Mode Live tetap pamit lalu tidur seperti sebelumnya. Sebelumnya: b23 logo 4 titik dihapus dari baris jawaban ("kita bukan Google"); b22 panel langsung mendengar tanpa gerbang dan mesin pengenalan diringankan; b21 izin mic otomatis + balasan dalam bubble. Asisten pribadi Android native, tanpa server perantara; otak AI memakai API key milik Anda.</string>
+    <string name="versi" formatted="false">AVI v2.4 — TEMA "ARK REACTOR" (pilihan pemilik): panel tahan-home kini TRANSPARAN — tanpa lembar gelap — dengan reaktor sian-teal 104dp di tengah: inti mengalir, dua cincin tipis berputar yang ikut mengikuti kerasnya suara, dan label keadaan (SIAP / MENDENGARKAN / MEMPROSES / AVI BERBICARA). Jawaban AVI muncul sebagai kartu kaca melayang. NAVBAR TIDAK LAGI disembunyikan saat panel terbuka (koreksi pemilik); bar bawah menghormati tinggi navbar. STATUS BAR BERSIH: bila Mode Penuh aktif, notifikasi penjaga dihapus total (sistem sendiri menjaga proses); di jalur fallback penjaga tetap hidup dengan notifikasi paling senyap. Ikon assist di config APK kini garis tipis miring — bila ROM tetap menggambar badge, isinya bukan lagi kotak putih kosong. Kartu baru "Izin &amp; kesehatan AVI": status jalur asisten, izin mikrofon, penjaga, dan baterai dalam satu layar, ketuk baris ✘ untuk memperbaiki. Sebelumnya: v2.3 kartu Mode asisten (dialog peran resmi memindahkan ponsel ke jalur layanan suara — bebas orb); v2.2 penjaga menyala seketika update terpasang; v2.1 penjaga proses hangat. Asisten pribadi Android native, tanpa server perantara; otak AI memakai API key milik Anda.</string>
 </resources>

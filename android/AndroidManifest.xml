@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.avi.assistant"
-    android:versionCode="14"
-    android:versionName="2.3">
+    android:versionCode="15"
+    android:versionName="2.4">
 
     <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34"/>
 
@@ -83,7 +83,10 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
             <meta-data android:name="com.android.systemui.action_assist_icon"
-                android:resource="@drawable/transparan"/>
+                android:resource="@drawable/ic_garis_asisstan"/>
+                <!-- v2.4 (amandemen pemilik): dulu transparan → ROM menggambar
+                     lingkaran putih KOSONG; kini garis tipis miring — bila
+                     badge tetap tampil, isinya bukan kotak putih polos. -->
         </activity>
 
         <activity android:name=".SettingsActivity" android:exported="false"/>

@@ -6,16 +6,27 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Orb AVI — bola cair ala Siri sebagai "wajah" asisten.
- * Empat keadaan: SIAP (bernapas pelan), MENDENGARKAN (berdenyut mengikuti
- * kerasnya suara via onRmsChanged), BERPIKIR (berputar pelan + satelit),
- * BICARA (gelombang cepat). Tanpa library apa pun — murni Canvas.
+ * ARK REACTOR v2.4 — wajah asisten AVI bergaya reaktor JARVIS.
+ *
+ * TEMA BARU pilihan pemilik (A. "ARK REACTOR", disetujui 2026):
+ * inti bola cair mengalir keluarga SIAN–TEAL, dikelilingi DUA CINCIN
+ * TIPIS berputar yang mengisyaratkan keadaan:
+ *   SIAP         cincin berputar paling pelan, pendaran tenang;
+ *   MENDENGARKAN cincin ikut mengikuti kerasnya suara (RMS);
+ *   BERPIKIR     cincin mempercepat, satelit mengorbit;
+ *   BICARA       gelombang cepat mengikuti TTS.
+ * Tanpa library apa pun — murni Canvas, murah untuk HP low-RAM
+ * (shader inti di-cache; cincin = dua drawArc per frame).
+ *
+ * Dipakai dua jalur panel tahan-home (overlay_avisession) dan Mode
+ * Live (activity_live) — identitas reaktor konsisten di mana pun.
  */
 public class OrbView extends View {
 
@@ -25,13 +36,12 @@ public class OrbView extends View {
     public static final int BICARA = 3;
 
     private int keadaan = SIAP;
-    private int warna = 0xFF38BDF8;   // sian elektrik — identitas Arc
+    private int warna = 0xFF38BDF8;   // sian elektrik — identitas AVI
 
-    // b17: mode GRADIEN ala Google Assistant — inti bola mengalir empat
-    // warna (biru muda → sian → indigo → ungu) dan berputar pelan;
-    // tahan tombol home terasa "asisten Google sungguhan".
-    private static final int[] WARNA_GOOGLE = {
-            0xFF7DD3FC, 0xFF38BDF8, 0xFF6366F1, 0xFFA855F7, 0xFF7DD3FC };
+    // v2.4 ARK: inti mengalir keluarga sian–teal (bukan lagi campuran
+    // ungu); putaran inti dipertahankan — terasa reaktor hidup.
+    private static final int[] WARNA_ARK = {
+            0xFFE0FBFF, 0xFF7DE8FF, 0xFF38BDF8, 0xFF2DD4BF, 0xFFE0FBFF };
     private boolean gradien = false;
     private SweepGradient sapuInti;          // cache — dibuat sekali per ukuran
     private int sapuLebar = -1;
@@ -41,6 +51,11 @@ public class OrbView extends View {
     private float rmsLembut = 0f;   // smoothing agar gerak halus
 
     private final Paint kuas = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint kuasRing = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF kotakRingLuar = new RectF();   // cincin luar
+    private final RectF kotakRingDalam = new RectF();  // cincin dalam
+    private int ringLebarCache = -1;
+
     private long mulaiNapas;
 
     public OrbView(Context c) { super(c); siap(); }
@@ -62,8 +77,7 @@ public class OrbView extends View {
 
     public void setWarnaOrb(int w) { warna = w; invalidate(); }
 
-    /** b17: nyalakan inti gradien ala Google Assistant (berputar pelan,
-     *  lebih cepat saat BERPIKIR). Cahaya luar tetap sian khas AVI. */
+    /** Inti gradien berputar (lebih cepat saat BERPIKIR). */
     public void setGradienGoogle(boolean g) {
         if (gradien == g) return;
         gradien = g;
@@ -111,6 +125,9 @@ public class OrbView extends View {
         }
         if (denyut < -0.09f) denyut = -0.09f;
 
+        // ===== CINCIN REAKTOR (digambar dulu, di balik pendaran) =====
+        gambarCincin(canvas, cx, cy, dasar, t);
+
         // lapisan luar: pendaran lembut
         float rLuar = dasar * (0.92f + denyut * 0.6f);
         kuas.setShader(new RadialGradient(cx, cy, rLuar,
@@ -126,10 +143,10 @@ public class OrbView extends View {
         // inti
         float rInti = dasar * (0.34f + denyut);
         if (gradien) {
-            // b17: shader di-CACHE (dibuat sekali per ukuran) — hanya matrix
+            // shader di-CACHE (dibuat sekali per ukuran) — hanya matrix
             // rotasi yang diubah tiap frame, hemat di HP low-RAM
             if (sapuInti == null || sapuLebar != getWidth()) {
-                sapuInti = new SweepGradient(cx, cy, WARNA_GOOGLE, null);
+                sapuInti = new SweepGradient(cx, cy, WARNA_ARK, null);
                 sapuLebar = getWidth();
             }
             float putaranDetik = keadaan == BERPIKIR ? 110f : 26f;
@@ -156,6 +173,59 @@ public class OrbView extends View {
         }
 
         postInvalidateOnAnimation();  // animasi terus sampai view tidak tampil
+    }
+
+    /** v2.4 ARK: dua cincin tipis berputar — jantung gaya reaktor.
+     *  Kecepatan & terangnya mengikuti keadaan + RMS (murah: 2 drawArc). */
+    private void gambarCincin(Canvas canvas, float cx, float cy,
+                              float dasar, float t) {
+        if (ringLebarCache != getWidth()) {
+            float rLuar = dasar * 0.84f;
+            float rDalam = dasar * 0.70f;
+            kotakRingLuar.set(cx - rLuar, cy - rLuar, cx + rLuar, cy + rLuar);
+            kotakRingDalam.set(cx - rDalam, cy - rDalam, cx + rDalam, cy + rDalam);
+            ringLebarCache = getWidth();
+        }
+
+        float derajat, alfa;
+        switch (keadaan) {
+            case MENDENGARKAN:
+                derajat = t * (70f + rmsLembut * 150f);
+                alfa = 140 + rmsLembut * 80;
+                break;
+            case BERPIKIR:
+                derajat = t * 150f;
+                alfa = 175;
+                break;
+            case BICARA:
+                derajat = t * (55f + 25f * (float) Math.sin(t * 5.0));
+                alfa = 135;
+                break;
+            default: // SIAP
+                derajat = t * 16f;
+                alfa = 65;
+                break;
+        }
+
+        kuasRing.setStyle(Paint.Style.STROKE);
+        kuasRing.setStrokeCap(Paint.Cap.ROUND);
+        kuasRing.setShader(null);
+
+        // cincin luar: busur 96° searah jarum keadaan
+        kuasRing.setStrokeWidth(Math.max(2f, dasar * 0.038f));
+        kuasRing.setColor(urai(warna, Math.min(220, (int) alfa)));
+        canvas.save();
+        canvas.rotate(derajat % 360f, cx, cy);
+        canvas.drawArc(kotakRingLuar, -90f, 96f, false, kuasRing);
+        canvas.restore();
+
+        // cincin dalam: busur 150° lawan arah, lebih tipis & redup
+        kuasRing.setStrokeWidth(Math.max(1.5f, dasar * 0.022f));
+        kuasRing.setColor(urai(warna, Math.min(160, (int) (alfa * 0.65f))));
+        canvas.save();
+        canvas.rotate(-(derajat * 0.62f + 130f) % 360f, cx, cy);
+        canvas.drawArc(kotakRingDalam, -30f, 150f, false, kuasRing);
+        canvas.restore();
     }
 
     private static int urai(int warna, int alfa) {
