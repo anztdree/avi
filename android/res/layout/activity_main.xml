@@ -56,6 +56,72 @@
             android:contentDescription="Pengaturan"/>
     </LinearLayout>
 
+    <!-- ==== v2.3 kartu MODE ASISTEN — tampil hanya bila jalur asisten
+         ponsel belum menunjuk layanan suara AVI (penyebab lingkaran
+         putih tetap tampil saat tombol home ditahan). ==== -->
+    <LinearLayout
+        android:id="@+id/kartuAsisten"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/card_settings"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/mode_asisten_judul"
+            android:textColor="@color/aksen" android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="@string/mode_asisten_isi"
+            android:textColor="@color/avi_teks_samping" android:textSize="13sp"
+            android:lineSpacingMultiplier="1.25"/>
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="@string/mode_asisten_tips"
+            android:textColor="@color/avi_teks_samping" android:textSize="12sp"
+            android:lineSpacingMultiplier="1.25"/>
+
+        <TextView
+            android:id="@+id/tvAsistenJalur"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:textColor="@color/avi_teks_samping" android:textSize="11sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:id="@+id/btnPerbaikiAsisten"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:background="@drawable/btn_primary"
+                android:paddingLeft="18dp" android:paddingRight="18dp"
+                android:paddingTop="10dp" android:paddingBottom="10dp"
+                android:text="Aktifkan Mode Penuh"
+                android:textColor="#FFFFFF" android:textSize="13sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/btnBukaPengaturanAsisten"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/btn_secondary"
+                android:paddingLeft="16dp" android:paddingRight="16dp"
+                android:paddingTop="10dp" android:paddingBottom="10dp"
+                android:text="@string/pengaturan"
+                android:textColor="@color/avi_teks" android:textSize="13sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- ==== hero (hanya saat obrolan kosong) ==== -->
     <LinearLayout
         android:id="@+id/heroBox"

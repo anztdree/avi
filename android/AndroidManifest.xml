@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.avi.assistant"
-    android:versionCode="13"
-    android:versionName="2.2">
+    android:versionCode="14"
+    android:versionName="2.3">
 
     <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34"/>
 
@@ -47,17 +47,23 @@
             </intent-filter>
         </activity>
 
-        <!-- LAYAR ORBIT = wajah asisten perangkat versi ACTIVITY.
-             Hasil penelusuran AOSP 12: AssistManager.startAssist()
-             meluncurkan ACTIVITY ber-intent ACTION_ASSIST bila isi
-             Settings.Secure.ASSISTANT bukan VoiceInteractionService
-             aktif; dan pada perangkat low-RAM (umum di itel/Transsion)
-             jalur VoiceInteractionService bahkan dilewati saat
-             kualifikasi (AssistantRoleBehavior) — asisten SELALU
-             dijalankan sebagai activity, persis model "Google Assistant
-             Go". Activity ini translucent, tanpa jejak Recents, dan
-             menutup sendiri saat AVI pamit. Perangkat non-low-RAM tetap
-             memakai jalur sesi overlay (AviSession) — tampilan identik. -->
+        <!-- LAYAR ORBIT = wajah asisten perangkat versi ACTIVITY
+             (fallback). Riset AOSP 12 (AssistManager.java baris 236):
+             jalur activity hanya dipakai bila isi
+             Settings.Secure.ASSISTANT BUKAN layanan suara aktif — dan
+             justru jalur inilah yang menampilkan orb/lingkaran putih
+             (disclosure asisten pihak ketiga) plus delay peluncuran
+             activity. v2.3 menambah kartu "Mode asisten" di MainActivity
+             yang memindahkan ponsel ke jalur sesi VIS lewat dialog peran
+             resmi (RoleManager.ROLE_ASSISTANT) — pada jalur sesi orb
+             tidak pernah ditampilkan (low-RAM: shouldShowOrb()==false).
+             Intent-filter ASSIST TETAP DIPERLUKAN: pada perangkat
+             low-RAM AssistantRoleBehavior.isPackageQualified hanya
+             menerima kandidat asisten yang punya activity
+             ACTION_ASSIST (AssistantRoleBehavior-12.java baris 146-179)
+             — tanpa itu AVI tidak bisa dipilih sebagai asisten sama
+             sekali. Activity ini translucent, tanpa jejak Recents, dan
+             menutup sendiri saat AVI pamit. -->
         <activity android:name=".OrbitAssistActivity"
             android:exported="true"
             android:theme="@style/TemaSesiOrbit"

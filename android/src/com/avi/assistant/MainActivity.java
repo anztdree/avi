@@ -3,11 +3,14 @@ package com.avi.assistant;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
@@ -45,6 +48,12 @@ public class MainActivity extends Activity {
     private final List<Msg> isi = new ArrayList<>();
     private boolean sedangStream = false;
     private int posisiAnimasi = Integer.MAX_VALUE;   // baris >= ini dianimasikan
+
+    // v2.3: kartu MODE ASISTEN — deteksi jalur panggilan home + tawaran
+    // perbaikan lewat dialog peran resmi sistem (RoleManager).
+    private LinearLayout kartuAsisten;
+    private TextView tvAsistenJalur;
+    private static final int MINTA_ROLE_ASISTEN = 771;
 
     // TTS mode chat: baca balasan AVI bila switch “Bacakan balasan” menyala
     private TextToSpeech tts;
@@ -118,6 +127,16 @@ public class MainActivity extends Activity {
         daftar.setAdapter(adptr);
 
         muatIsi();
+
+        // v2.3: MODE ASISTEN — deteksi jalur panggilan home + tawaran
+        // perbaikan (kartu di bawah bar atas; hilang sendiri setelah
+        // jalur ponsel menunjuk layanan suara AVI).
+        kartuAsisten   = findViewById(R.id.kartuAsisten);
+        tvAsistenJalur = findViewById(R.id.tvAsistenJalur);
+        findViewById(R.id.btnPerbaikiAsisten).setOnClickListener(v -> aktifkanModePenuh());
+        findViewById(R.id.btnBukaPengaturanAsisten)
+                .setOnClickListener(v -> bukaPengaturanAsisten());
+        cekModeAsisten();
     }
 
     /** v2.1: Transsion/itel agresif mematikan proses latar — bila
@@ -157,6 +176,9 @@ public class MainActivity extends Activity {
             siapkanTts();
         }
         muatIsi();   // sesi Mode Live menulis ke riwayat — segarkan
+        // v2.3: pemilik baru kembali dari dialog peran / Pengaturan —
+        // periksa lagi apakah jalur asisten sudah penuh.
+        cekModeAsisten();
     }
 
     @Override
@@ -200,6 +222,92 @@ public class MainActivity extends Activity {
         return s.replaceAll("(?s)```.*?```", " (blok kode dilewati) ")
                 .replaceAll("[#*_`>]", " ")
                 .replaceAll("\\s+", " ").trim();
+    }
+
+    // ======================= v2.3: mode asisten =======================
+
+    /** Baca setelan aman (hanya baca, tanpa izin); null bila terlarang. */
+    private String bacaSetelan(String kunci) {
+        try { return Settings.Secure.getString(getContentResolver(), kunci); }
+        catch (Exception e) { return null; }
+    }
+
+    /** PENUH = asisten ponsel menunjuk LAYANAN SUARA AVI
+     *  (VoiceInteractionService) — jalur yang sama dengan Google
+     *  Assistant. Hasil riset AOSP 12: AssistManager hanya menampilkan
+     *  orb/lingkaran putih pada jalur activity; pada jalur layanan
+     *  (isService) orb tidak pernah muncul dan panel sesi dibuka
+     *  langsung oleh sistem. */
+    private boolean modeAsistenPenuh() {
+        ComponentName vis = new ComponentName(this, AviVoiceInteractionService.class);
+        String a = bacaSetelan("assistant");
+        ComponentName ca = a == null ? null : ComponentName.unflattenFromString(a);
+        String v = bacaSetelan("voice_interaction_service");
+        ComponentName cv = v == null ? null : ComponentName.unflattenFromString(v);
+        return vis.equals(ca) && vis.equals(cv);
+    }
+
+    /** Tampilkan/sembunyikan kartu mode asisten sesuai keadaan ponsel. */
+    private void cekModeAsisten() {
+        if (kartuAsisten == null) return;
+        if (modeAsistenPenuh()) {
+            kartuAsisten.setVisibility(View.GONE);
+            AviBrain.pref(this).edit().putBoolean("mode_asisten_ok", true).apply();
+            return;
+        }
+        AviBrain.pref(this).edit().putBoolean("mode_asisten_ok", false).apply();
+        String a = bacaSetelan("assistant");
+        tvAsistenJalur.setText(getString(R.string.mode_asisten_jalur,
+                a == null || a.trim().isEmpty() ? "(kosong)" : a));
+        kartuAsisten.setVisibility(View.VISIBLE);
+    }
+
+    /** Tombol utama kartu: minta sistem memasang AVI sebagai asisten
+     *  lewat dialog peran resmi (ROLE_ASSISTANT). Saat pemilik
+     *  menyetujui, VoiceInteractionManagerService (RoleObserver, AOSP
+     *  12 baris 1885-1913) menulis setting `assistant` DAN
+     *  `voice_interaction_service` ke layanan suara AVI — orb putih
+     *  mati total. Perangkat < Android 10: langsung ke Pengaturan. */
+    private void aktifkanModePenuh() {
+        if (Build.VERSION.SDK_INT >= 29) {
+            try {
+                android.app.role.RoleManager rm =
+                        (android.app.role.RoleManager) getSystemService(
+                                android.app.role.RoleManager.class);
+                if (rm != null && rm.isRoleAvailable(android.app.role.RoleManager.ROLE_ASSISTANT)) {
+                    startActivityForResult(rm.createRequestRoleIntent(
+                            android.app.role.RoleManager.ROLE_ASSISTANT),
+                            MINTA_ROLE_ASISTEN);
+                    return;
+                }
+            } catch (Exception ignored) { }
+        }
+        bukaPengaturanAsisten();
+    }
+
+    private void bukaPengaturanAsisten() {
+        try {
+            startActivity(new Intent(Settings.ACTION_VOICE_INPUT_SETTINGS));
+        } catch (Exception e) {
+            try { startActivity(new Intent(Settings.ACTION_SETTINGS)); }
+            catch (Exception ignored) { }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != MINTA_ROLE_ASISTEN) return;
+        // Perubahan peran diproses sistem secara tak-sinkron — periksa
+        // ulang setelah jeda singkat.
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            boolean penuh = modeAsistenPenuh();
+            cekModeAsisten();
+            if (penuh) {
+                Toast.makeText(this, R.string.mode_asisten_sukses,
+                        Toast.LENGTH_LONG).show();
+            }
+        }, 1200);
     }
 
     // ============================ tampilan ============================

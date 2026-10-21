@@ -4,6 +4,13 @@
     <string name="kirim">Kirim</string>
     <string name="pengaturan">Pengaturan</string>
     <string name="sedang_berpikir">AVI sedang berpikir…</string>
+
+    <!-- v2.3: kartu MODE ASISTEN -->
+    <string name="mode_asisten_judul">Mode asisten belum penuh</string>
+    <string name="mode_asisten_isi">Ponsel ini masih memanggil AVI lewat jalur activity lama — itulah sebabnya lingkaran putih tetap tampil saat tombol home ditahan. Aktifkan jalur penuh ala Google Assistant (layanan suara AVI): tanpa lingkaran putih, panel langsung tampil.</string>
+    <string name="mode_asisten_tips">Kalau dialog tidak muncul atau lingkaran masih tampil: restart HP sekali (jalur diperbaiki otomatis saat menyala), atau buka Pengaturan → Aplikasi default → Asisten digital, pilih Tidak ada lalu pilih AVI lagi.</string>
+    <string name="mode_asisten_jalur" formatted="false">Jalur aktif saat ini: %1$s</string>
+    <string name="mode_asisten_sukses">Mode asisten penuh aktif — lingkaran putih tidak akan muncul lagi.</string>
     <string name="hint_nama_pemilik">Nama panggilan Anda, mis. Pak Budi / Sir</string>
     <string name="versi" formatted="false">AVI v1.7 — b24: TINGKAT B WAKEUP VOICE (permintaan pemilik, dipilih dari rencana tiga tingkat). Setelah AVI pamit karena hening, panel TIDAK lagi ditutup: AVI pamit singkat, lalu mic menyala dalam mode MENUNGGU SAPA — keadaan tampil tetap tenang, dan cukup ucapkan "Avi" untuk melanjutkan ngobrol tanpa tahan home lagi. Lebih pintar lagi: ucapkan "Avi jam berapa" maka sapaan dibuang dan pertanyaannya langsung dijawab dalam satu napas. Mengetik di pill juga membangunkan, dan bubble menampilkan petunjuk "Ucapkan Avi untuk melanjutkan" saat AVI istirahat. Hening saat menunggu adalah kondisi normal tanpa hitungan tidur; panel ditutup manual (ketuk kosong atau usap ke bawah) = benar-benar mati, nol mic dan nol baterai — inilah arti "tidak bekerja 24 jam, siap di panggung jika diperlukan". Mode Live tetap pamit lalu tidur seperti sebelumnya. Sebelumnya: b23 logo 4 titik dihapus dari baris jawaban ("kita bukan Google"); b22 panel langsung mendengar tanpa gerbang dan mesin pengenalan diringankan; b21 izin mic otomatis + balasan dalam bubble. Asisten pribadi Android native, tanpa server perantara; otak AI memakai API key milik Anda.</string>
 </resources>
