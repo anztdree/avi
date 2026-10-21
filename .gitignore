@@ -1,5 +1,0 @@
-# Artefak build (dibuat ulang otomatis oleh scripts/build-avi-apk.sh)
-android/build/
-
-# Tanda tangan APK instalasi inkremental (regenerasi otomatis saat sign)
-*.idsig
