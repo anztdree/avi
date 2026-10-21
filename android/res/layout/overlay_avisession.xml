@@ -23,12 +23,15 @@
      - mesin menyala otomatis begitu panel tergambar; tanpa izin mic
        pill ketik tetap hidup.
 
-     Catatan jujur: lingkaran putih yang muncul SEKETIKA saat tombol
-     home DITAHAN adalah animasi tekan bawaan sistem (SystemUI/ROM)
-     — digambar sistem DI ATAS jendela aplikasi mana pun, ikon di
-     dalamnya sudah dikosongkan sejak v1.9, wadahnya sendiri tidak
-     berhak dihapus oleh aplikasi biasa. Panel gelap penuh membuat
-     layar tetap bersih setelah panel terbuka. ===================== -->
+     Catatan jujur (diperbarui v2.1): lingkaran putih yang muncul
+     SEKETIKA saat tombol home DITAHAN adalah animasi tekan bawaan
+     sistem (SystemUI/ROM) — digambar sistem DI ATAS jendela aplikasi
+     mana pun, wadahnya tidak berhak dihapus aplikasi biasa. TAPI
+     dulu ia menganga LAMA karena proses AVI harus dingin dulu
+     (cold start 1-3 dtk di HP low-RAM) — kini LayananJaga menjaga
+     proses hangat 24 jam sehingga panel muncul seketika dan badge
+     itu hanya berkedip sepersekian detik; saat panel terbuka navbar
+     ikut disembunyikan sehingga area tombol home bersih. ==== -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/akarSesi"
     android:layout_width="match_parent"

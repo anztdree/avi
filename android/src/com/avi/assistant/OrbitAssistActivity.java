@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
 import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +14,8 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -139,6 +142,37 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
         // satu animasi pendek saja — panel muncul nyaris seketika
         akar.setAlpha(0f);
         akar.animate().alpha(1f).setDuration(120L).start();
+
+        // v2.1: navbar disembunyikan selama panel terbuka — area tombol
+        // home (tempat badge lingkaran putih sistem menempel) hilang dari
+        // pandangan; panel terasa penuh layar ala Google Assistant.
+        sembunyikanBarSistem();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) sembunyikanBarSistem();   // re-hide setelah fokus balik
+    }
+
+    /** v2.1: bar navigasi disembunyikan (IMMERSIVE_STICKY) selama panel
+     *  AVI terbuka. Sapu dari bawah memunculkannya sesaat tanpa
+     *  mengguncang layout. Tutup panel tetap: ketuk kosong / usap bawah. */
+    private void sembunyikanBarSistem() {
+        View d = getWindow().getDecorView();
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController c = d.getWindowInsetsController();
+            if (c != null) {
+                c.hide(WindowInsets.Type.navigationBars());
+                c.setSystemBarsBehavior(WindowInsetsController
+                        .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            d.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
     }
 
     @Override

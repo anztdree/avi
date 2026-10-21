@@ -5,7 +5,11 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -70,6 +74,13 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
+        // v2.1: PENJAGA KECEPATAN — proses dijaga hangat sejak app
+        // dibuka; tahan home = panel muncul seketika (tanpa delay
+        // cold start yang membuat badge lingkaran putih sistem
+        // menganga lama di atas tombol home).
+        LayananJaga.nyalakan(this);
+        mintaBebasBaterai();
+
         daftar     = findViewById(R.id.daftarChat);
         heroBox    = findViewById(R.id.heroBox);
         tvSalam    = findViewById(R.id.tvSalam);
@@ -107,6 +118,27 @@ public class MainActivity extends Activity {
         daftar.setAdapter(adptr);
 
         muatIsi();
+    }
+
+    /** v2.1: Transsion/itel agresif mematikan proses latar — bila
+     *  penjaga dibunuh, panggilan home kembali dingin (delay lama).
+     *  Minta pengecualian baterai SEKALI saja; pilihan tetap di tangan
+     *  pemilik (dilarang menolak pun penjaga tetap berusaha START_STICKY). */
+    private void mintaBebasBaterai() {
+        if (Build.VERSION.SDK_INT < 23) return;
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm == null) return;
+        String pkg = getPackageName();
+        if (pm.isIgnoringBatteryOptimizations(pkg)) return;
+        if (AviBrain.pref(this).getBoolean("diminta_bebas_baterai", false)) return;
+        AviBrain.pref(this).edit().putBoolean("diminta_bebas_baterai", true).apply();
+        try {
+            startActivity(new Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:" + pkg)));
+        } catch (Exception ignored) {
+            // ROM tanpa layar pengaturan itu — biarkan START_STICKY bekerja
+        }
     }
 
     @Override

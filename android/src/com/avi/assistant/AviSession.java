@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionSession;
 import android.text.Editable;
@@ -18,6 +19,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -155,6 +158,17 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
 
+        // v2.1: navbar disembunyikan selama panel terbuka — area tombol
+        // home (tempat badge lingkaran putih sistem menempel) hilang dari
+        // pandangan; panel terasa penuh layar ala Google Assistant.
+        // Sesi tak punya callback fokus → sembunyikan berulang (murah).
+        sembunyikanBarSistem();
+        if (akar != null) {
+            akar.post(this::sembunyikanBarSistem);
+            akar.postDelayed(this::sembunyikanBarSistem, 250L);
+            akar.postDelayed(this::sembunyikanBarSistem, 900L);
+        }
+
         // satu animasi pendek saja — sesi muncul nyaris seketika
         if (akar != null) {
             akar.setAlpha(0f);
@@ -178,6 +192,28 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             // satu pun yang meminta, mesin mati diam tanpa pesan
             if (!micSip) mintaIzinMic();
         });
+    }
+
+    /** v2.1: bar navigasi disembunyikan (IMMERSIVE_STICKY) selama panel
+     *  AVI terbuka. Sapu dari bawah memunculkannya sesaat tanpa
+     *  mengguncang layout. Tutup panel tetap: ketuk kosong / usap bawah. */
+    private void sembunyikanBarSistem() {
+        Dialog jendela = getWindow();
+        if (jendela == null || jendela.getWindow() == null) return;
+        View d = jendela.getWindow().getDecorView();
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController c = d.getWindowInsetsController();
+            if (c != null) {
+                c.hide(WindowInsets.Type.navigationBars());
+                c.setSystemBarsBehavior(WindowInsetsController
+                        .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            d.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
     }
 
     /** b21: izin mic diminta lewat activity transparan kecil
