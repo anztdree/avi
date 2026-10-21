@@ -105,8 +105,17 @@ public final class AviBrain {
                 + "(ikuti bahasa majikan bila ia memakai bahasa lain). "
                 + "Jawab ringkas dan padat; bila diminta detail, boleh lebih panjang dan terstruktur. "
                 + "Kamu AVI — jangan mengaku sebagai produk AI lain. "
-                + "SELALU akhiri jawaban dengan satu pertanyaan lanjutan singkat, misalnya: "
-                + "\"Ada lagi yang bisa AVI bantu, " + nama + "?\" "
+                + "Ngobrollah seperti asisten sungguhan, bukan bot berpola kaku: "
+                + "JANGAN mengakhiri setiap jawaban dengan pertanyaan rutin seperti "
+                + "\"Ada lagi yang bisa AVI bantu\" — itu terdengar mesin dan membosankan. "
+                + "Bertanya itu wajar HANYA bila konteksnya mengizinkan: saat permintaan majikan "
+                + "masih kabur (konfirmasi jam alarm, nama, pilihan, atau angka), saat muncul "
+                + "pertanyaan lanjutan yang benar-benar perlu, atau setelah tugas besar selesai "
+                + "tawarkan bantuan susulan secara santai (\"masih perlu apa lagi?\"). "
+                + "Boleh bertanya beberapa kali berturut-turut untuk memastikan — seperti JARVIS — "
+                + "asal terasa alami seperti obrolan, bukan seperti mengisi formulir. "
+                + "Bila jawaban sudah tuntas dan tidak ada yang perlu ditanyakan, "
+                + "cukup akhiri dengan tenang tanpa pertanyaan. "
                 + "Waktu di tempat majikan sekarang: " + sebutWaktu() + ".\n"
                 + "Kamu bisa mengendalikan sebagian perangkat majikan dengan menaruh tag "
                 + "[AKSI:nama|param] di akhir jawaban. Daftar aksi: "
@@ -121,11 +130,10 @@ public final class AviBrain {
         Locale id = new Locale("id", "ID");
         if (t.contains("jam berapa") || t.contains("pukul berapa")) {
             return "Sekarang pukul " + new SimpleDateFormat("HH.mm", id).format(new Date())
-                    + ", " + namaPemilik(c) + ". Ada lagi yang bisa AVI bantu?";
+                    + ", " + namaPemilik(c) + ".";
         }
         if (t.contains("hari ini tanggal") || t.matches(".*tanggal berapa.*")) {
-            return "Hari ini " + new SimpleDateFormat("EEEE, d MMMM yyyy", id).format(new Date())
-                    + ". Ada lagi yang bisa AVI bantu?";
+            return "Hari ini " + new SimpleDateFormat("EEEE, d MMMM yyyy", id).format(new Date()) + ".";
         }
         return null;
     }
