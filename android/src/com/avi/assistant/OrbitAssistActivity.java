@@ -52,6 +52,10 @@ import android.widget.TextView;
  * cukup ucapkan "Avi" untuk melanjutkan ngobrol tanpa tahan home lagi
  * ("Avi jam berapa" bahkan langsung dijawab). Mengetik di pill juga
  * membangunkan. Panel ditutup manual = benar-benar mati (nol mic).
+ *
+ * v2.0 (review pemilik: "sisa bulat-bulat... hapus napa biar bersih"):
+ * ORB di panel DIHAPUS — panel kini lembar JARVIS bersih: bubble
+ * jawaban + pill + tombol suara, tanpa satu pun ornamen bulat.
  */
 public class OrbitAssistActivity extends Activity implements LiveEngine.Pendengar {
 
@@ -60,7 +64,6 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
     private EditText etPil;
     private ImageView ikonSuara;
     private TextView tvAvi;
-    private OrbView orb;             // v1.9: identitas orb di panel asisten
     private View bSuara;
     private LiveEngine mesin;
     private boolean mesinJalan;
@@ -86,7 +89,7 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
         ikonSuara = findViewById(R.id.ikonSuaraSesi);
         bSuara = findViewById(R.id.bSuaraSesi);
         tvAvi = findViewById(R.id.tvAviSesi);
-        orb = findViewById(R.id.orbSesi);   // v1.9: orb JARVIS di panel
+        // v2.0: orb dihapus dari panel (pemilik: "biar bersih")
 
         // usap ke bawah = tutup (pola Google); ketukan biasa diteruskan
         // ke onClick akar = KETUK AREA KOSONG = tutup (pola web disetujui)
@@ -269,7 +272,6 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
 
     @Override public void keadaan(int k) {
         keadaan = k;
-        if (orb != null) orb.setKeadaan(k);   // v1.9: orb ikut berdenyut
         perbaruiTombol();
     }
 
@@ -304,7 +306,8 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
     }
 
     @Override public void rms(float rmsdb) {
-        if (orb != null) orb.setRms(rmsdb);   // v1.9: denyut ikut suara
+        // v2.0: tanpa orb di panel — umpan balik dengar cukup dari
+        // denyut tombol mic dan hint "Mendengarkan…"
     }
 
     @Override public void tetidur() { pamit(); }

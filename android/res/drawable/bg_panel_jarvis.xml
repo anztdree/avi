@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- LEMBAR JARVIS v2.0 — dasar panel asisten tahan-home.
+     Permintaan pemilik (review v1.9): "masih ada sisa bulat-bulat,
+     hapus napa biar bersih". Maka panel kini LEMBAR GELAP penuh
+     milik AVI sendiri — app di belakang tidak lagi bocor terlihat
+     (dulu scrim tipis 0,30 membuat logo 4 titik & sapaan layar
+     utama terlihat samar di belakang panel). Dasar navy dalam +
+     pendaran sian halus di pangkal = konsol JARVIS yang bersih.
+     96% pekat: cukup solid agar bersih, tetap selangkah lebih
+     lembut daripada hitam mati. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <color android:color="@color/sesi_dasar"/>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial"
+                android:centerX="0.50" android:centerY="0.94"
+                android:gradientRadius="420dp"
+                android:startColor="#2E38BDF8"
+                android:endColor="#0038BDF8"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial"
+                android:centerX="0.06" android:centerY="0.02"
+                android:gradientRadius="300dp"
+                android:startColor="#1A1E5A8C"
+                android:endColor="#001E5A8C"/>
+        </shape>
+    </item>
+</layer-list>

@@ -1,35 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Latar depan ikon adaptif AVI: orb menyala — identitas yang sama dengan
-     orb di dalam aplikasi. Semua elemen di dalam zona aman 66dp tengah. -->
+<!-- LATAR DEPAN IKON ADAPTIF AVI v2.0 "NEON CORE" — inti orb menyala
+     duduk di jalur orbit tipis, dilintasi SATU busur terang (identitas
+     "arc" ala reaktor Stark) + dua titik satelit kecil. Semua elemen
+     di dalam zona aman 66dp tengah (radius 33 dari titik 54,54). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
 
-    <!-- pendar luar -->
-    <path android:fillColor="#FFFFFF"
-        android:fillAlpha="0.10"
-        android:pathData="M54,21 a33,33 0 1,1 -0.01,0 z"/>
-
-    <!-- pendar inti -->
-    <path android:fillColor="#FFFFFF"
-        android:fillAlpha="0.16"
+    <!-- pendar luar lembut -->
+    <path android:fillColor="#38BDF8" android:fillAlpha="0.10"
         android:pathData="M54,27 a27,27 0 1,1 -0.01,0 z"/>
+    <!-- pendar inti -->
+    <path android:fillColor="#38BDF8" android:fillAlpha="0.17"
+        android:pathData="M54,32 a22,22 0 1,1 -0.01,0 z"/>
 
-    <!-- cincin luar -->
-    <path android:strokeColor="#FFFFFF" android:strokeAlpha="0.45"
-        android:strokeWidth="3" android:strokeLineCap="round"
-        android:pathData="M54,31 a23,23 0 1,1 -0.01,0 z"/>
+    <!-- jalur orbit penuh (tipis, redup) -->
+    <path android:strokeColor="#7DD3FC" android:strokeAlpha="0.34"
+        android:strokeWidth="1.8"
+        android:pathData="M54,38 a16,16 0 1,1 -0.01,0 z"/>
 
-    <!-- cincin dalam -->
-    <path android:strokeColor="#FFFFFF" android:strokeAlpha="0.80"
-        android:strokeWidth="2.5" android:strokeLineCap="round"
-        android:pathData="M54,37.5 a16.5,16.5 0 1,1 -0.01,0 z"/>
+    <!-- BUSUR TERANG 140° melintang puncak orbit — tanda tangan "arc" -->
+    <path android:strokeColor="#9BE4FF" android:strokeAlpha="0.95"
+        android:strokeWidth="3.4" android:strokeLineCap="round"
+        android:pathData="M38.97,48.53 A16,16 0 0,1 69.03,48.53"/>
 
-    <!-- inti terang -->
-    <path android:fillColor="#FFFFFF"
+    <!-- bibir cincin dalam -->
+    <path android:strokeColor="#BFE9FF" android:strokeAlpha="0.50"
+        android:strokeWidth="2"
         android:pathData="M54,43.5 a10.5,10.5 0 1,1 -0.01,0 z"/>
 
-    <!-- titik aksen: AVI "hidup" -->
-    <path android:fillColor="#8FD0FF"
-        android:pathData="M63.5,42.5 a3.5,3.5 0 1,1 -0.01,0 z"/>
+    <!-- inti menyala -->
+    <path android:fillColor="#F4FBFF"
+        android:pathData="M54,46.6 a7.4,7.4 0 1,1 -0.01,0 z"/>
+    <path android:fillColor="#9BE4FF" android:fillAlpha="0.55"
+        android:pathData="M54,49 a5,5 0 1,1 -0.01,0 z"/>
+
+    <!-- titik satelit kecil di jalur (kanan-bawah) -->
+    <path android:fillColor="#7DD3FC" android:fillAlpha="0.70"
+        android:pathData="M69.45,56.24 a1.9,1.9 0 1,1 -0.01,0 z"/>
+    <path android:fillColor="#7DD3FC" android:fillAlpha="0.45"
+        android:pathData="M48.53,67.53 a1.5,1.5 0 1,1 -0.01,0 z"/>
 </vector>

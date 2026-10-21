@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ===================== LAYAR UTAMA "AVI Arc" v1.2 =====================
-     Diringkas mengikuti kalibrasi web (Task 11, "efisien yg utama"):
-     - Hero: logo 4 titik STATIS (nol animasi) + salam + satu ajakan —
-       TANPA orb 136dp bernapas, TANPA kisi kartu saran 2x2.
-     - Obrolan: gelembung AVI beravatar kiri / pil gradasi user kanan
-     - Input: pil kaca melayang + tombol aksi gradasi
+<!-- ===================== LAYAR UTAMA "AVI Arc" v2.0 =====================
+     Rom bak atas review pemilik (21 Okt 2026): "rombak lah tampilan,
+     masih jadul aja" + "masih ada sisa bulat-bulat itu, hapus napa
+     biar bersih".
+
+     Perubahan v2.0:
+     - LOGO 4 TITIK di hero DIHAPUS TOTAL ("kita bukan Google") —
+       hero kini sapaan besar bersih dengan garis aksen tipis;
+     - TITIK STATUS hijau di bar atas dihapus — teks "Siap" saja;
+     - obrolan: gelembung AVI beravatar kiri / pil gradasi user kanan
+       (tetap, sudah sesuai selera pemilik);
+     - input: pil melayang + tombol aksi gradasi (tetap).
 ==================================================================== -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
@@ -30,14 +36,9 @@
             android:textSize="19sp" android:textStyle="bold"
             android:letterSpacing="0.10"/>
 
-        <View
-            android:layout_width="7dp" android:layout_height="7dp"
-            android:layout_marginLeft="9dp"
-            android:background="@drawable/titik_status"/>
-
         <TextView
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
+            android:layout_marginLeft="9dp"
             android:text="Siap" android:textColor="@color/avi_teks_samping"
             android:textSize="11sp" android:letterSpacing="0.06"/>
 
@@ -64,24 +65,24 @@
         android:paddingTop="20dp" android:paddingBottom="12dp"
         android:paddingLeft="20dp" android:paddingRight="20dp">
 
-        <ImageView
-            android:layout_width="64dp" android:layout_height="14dp"
-            android:layout_marginTop="34dp"
-            android:src="@drawable/logo_avi"
-            android:contentDescription="AVI"/>
+        <View
+            android:layout_width="30dp" android:layout_height="3dp"
+            android:layout_marginTop="46dp"
+            android:background="@drawable/garis_akses"
+            android:contentDescription=""/>
 
         <TextView
             android:id="@+id/tvSalam"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="18dp"
             android:gravity="center"
-            android:textColor="@color/avi_teks" android:textSize="29sp"
+            android:textColor="@color/avi_teks" android:textSize="30sp"
             android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tvSub"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="8dp"
             android:gravity="center"
             android:textColor="@color/avi_teks_samping" android:textSize="14sp"/>
     </LinearLayout>

@@ -57,6 +57,10 @@ import android.widget.TextView;
  * cukup ucapkan "Avi" untuk melanjutkan ngobrol tanpa tahan home lagi
  * ("Avi jam berapa" bahkan langsung dijawab). Mengetik di pill juga
  * membangunkan. Panel ditutup manual = benar-benar mati (nol mic).
+ *
+ * v2.0 (review pemilik: "sisa bulat-bulat... hapus napa biar bersih"):
+ * ORB di panel DIHAPUS — panel kini lembar JARVIS bersih: bubble
+ * jawaban + pill + tombol suara, tanpa satu pun ornamen bulat.
  */
 public class AviSession extends VoiceInteractionSession implements LiveEngine.Pendengar {
 
@@ -69,7 +73,6 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     private LiveEngine mesin;
     private GestureDetector usap;
     private ObjectAnimator denyut;
-    private OrbView orb;             // v1.9: identitas orb di panel asisten
     private int keadaan = OrbView.SIAP;
     private boolean micSip = true;
     private boolean transkripDiPil = false;
@@ -87,7 +90,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
         ikonSuara = akar.findViewById(R.id.ikonSuaraSesi);
         bSuara = akar.findViewById(R.id.bSuaraSesi);
         tvAvi = akar.findViewById(R.id.tvAviSesi);
-        orb = akar.findViewById(R.id.orbSesi);   // v1.9: orb JARVIS di panel
+        // v2.0: orb dihapus dari panel (pemilik: "biar bersih")
 
         // usap ke bawah = tutup; ketukan biasa diteruskan ke onClick akar
         // = KETUK AREA KOSONG = tutup (pola web disetujui)
@@ -281,7 +284,6 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
 
     @Override public void keadaan(int k) {
         keadaan = k;
-        if (orb != null) orb.setKeadaan(k);   // v1.9: orb ikut berdenyut
         perbaruiTombol();
     }
 
@@ -316,7 +318,8 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     }
 
     @Override public void rms(float rmsdb) {
-        if (orb != null) orb.setRms(rmsdb);   // v1.9: denyut ikut suara
+        // v2.0: tanpa orb di panel — umpan balik dengar cukup dari
+        // denyut tombol mic dan hint "Mendengarkan…"
     }
 
     @Override public void tetidur() {

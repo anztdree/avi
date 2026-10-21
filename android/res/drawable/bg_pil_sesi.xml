@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- PIL "Tanya AVI…" panel asisten (b19) — pill gelap bulat penuh
-     dengan garis tipis, persis web: rgba(24,34,30,0.92) +
-     border rgba(255,255,255,0.10). -->
+<!-- PIL "Tanya AVI…" v2.0 — pil kaca gelap bulat penuh dengan garis
+     sian tipis; duduk di atas lembar JARVIS (bg_panel_jarvis). -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#EC0E1626"/>
-    <corners android:radius="26dp"/>
-    <stroke android:width="1dp" android:color="#1AFFFFFF"/>
+    <solid android:color="#D9101B30"/>
+    <corners android:radius="27dp"/>
+    <stroke android:width="1dp" android:color="@color/sesi_garis"/>
 </shape>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ikon bulat cadangan untuk Android 7: sama dengan ic_launcher. -->
+<!-- Ikon cadangan Android 7 (sebelum ikon adaptif) v2.0 "NEON CORE":
+     lingkaran navy dalam + orb menyala + busur orbit terang. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
@@ -9,24 +10,52 @@
             <gradient
                 android:type="linear"
                 android:angle="315"
-                android:startColor="#2A4BD8"
-                android:centerColor="#3E46D6"
-                android:endColor="#6A3BD8"/>
+                android:startColor="#04101F"
+                android:centerColor="#0A1E38"
+                android:endColor="#122B4E"/>
         </aapt:attr>
     </path>
 
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.10"
-        android:pathData="M54,21 a33,33 0 1,1 -0.01,0 z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.16"
+    <!-- pendaran sian kiri-atas -->
+    <path android:pathData="M4,4 h108 v108 h-108 z">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="0.24" android:centerY="0.16"
+                android:gradientRadius="150dp"
+                android:startColor="#3338BDF8"
+                android:endColor="#0038BDF8"/>
+        </aapt:attr>
+    </path>
+
+    <!-- pendar luar + inti -->
+    <path android:fillColor="#38BDF8" android:fillAlpha="0.10"
         android:pathData="M54,27 a27,27 0 1,1 -0.01,0 z"/>
-    <path android:strokeColor="#FFFFFF" android:strokeAlpha="0.45"
-        android:strokeWidth="3" android:strokeLineCap="round"
-        android:pathData="M54,31 a23,23 0 1,1 -0.01,0 z"/>
-    <path android:strokeColor="#FFFFFF" android:strokeAlpha="0.80"
-        android:strokeWidth="2.5" android:strokeLineCap="round"
-        android:pathData="M54,37.5 a16.5,16.5 0 1,1 -0.01,0 z"/>
-    <path android:fillColor="#FFFFFF"
+    <path android:fillColor="#38BDF8" android:fillAlpha="0.17"
+        android:pathData="M54,32 a22,22 0 1,1 -0.01,0 z"/>
+
+    <!-- jalur orbit -->
+    <path android:strokeColor="#7DD3FC" android:strokeAlpha="0.34"
+        android:strokeWidth="1.8"
+        android:pathData="M54,38 a16,16 0 1,1 -0.01,0 z"/>
+
+    <!-- busur terang (tanda tangan "arc") -->
+    <path android:strokeColor="#9BE4FF" android:strokeAlpha="0.95"
+        android:strokeWidth="3.4" android:strokeLineCap="round"
+        android:pathData="M38.97,48.53 A16,16 0 0,1 69.03,48.53"/>
+
+    <!-- cincin dalam + inti menyala -->
+    <path android:strokeColor="#BFE9FF" android:strokeAlpha="0.50"
+        android:strokeWidth="2"
         android:pathData="M54,43.5 a10.5,10.5 0 1,1 -0.01,0 z"/>
-    <path android:fillColor="#8FD0FF"
-        android:pathData="M63.5,42.5 a3.5,3.5 0 1,1 -0.01,0 z"/>
+    <path android:fillColor="#F4FBFF"
+        android:pathData="M54,46.6 a7.4,7.4 0 1,1 -0.01,0 z"/>
+    <path android:fillColor="#9BE4FF" android:fillAlpha="0.55"
+        android:pathData="M54,49 a5,5 0 1,1 -0.01,0 z"/>
+
+    <!-- satelit kecil -->
+    <path android:fillColor="#7DD3FC" android:fillAlpha="0.70"
+        android:pathData="M69.45,56.24 a1.9,1.9 0 1,1 -0.01,0 z"/>
+    <path android:fillColor="#7DD3FC" android:fillAlpha="0.45"
+        android:pathData="M48.53,67.53 a1.5,1.5 0 1,1 -0.01,0 z"/>
 </vector>

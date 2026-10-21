@@ -1,59 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SESI ASISTEN AVI v1.6 (b23) — PANEL ASISTEN MURNI, disetujui
-     pemilik lewat kalibrasi visual web (Task 13-17):
+<!-- ================= PANEL ASISTEN AVI v2.0 "LEMBAR JARVIS" ============
 
-     Yang ADA (persis web yang disetujui):
-     - layar belakang HANYA disentuh redup tipis 0,30 (#4D070F0C —
-       nyaris terang; app di belakang jelas terlihat);
-     - jawaban AVI melayang di ATAS pill dalam BUBBLE
-     - SATU bar di bawah: pill "Tanya AVI…" + tombol suara;
-     - KATA-KATA PEMILIK (bicara maupun ketik) tampil DI DALAM pill,
-       hilang sendiri saat giliran tuntas (pola web Task 15);
-     - tombol suara TIGA PERAN: mic (denyut saat mendengarkan) →
-       kirim (ada ketikan) → stop (AVI sedang bicara);
-     - usap ke bawah = tutup; KETUK area kosong = tutup.
+     Rom bak total atas permintaan pemilik (review v1.9, 21 Okt 2026):
+     "tombol home di tekan launcher icon emang gak ada tapi masih ada
+     sisa bulat-bulat itu... kenapa harus pake itu, hapus napa biar
+     bersih!"
 
-     Yang TIDAK ada lagi (dibanding b18):
-     - tanpa salam "Hai, ...", tanpa tombol ✕, tanpa teks status,
-     - tanpa EMPAT TITIK beranimasi (umpan balik dengar cukup dari
-       denyut tombol mic — dua elemen = dua fungsi),
-     - tanpa petunjuk "usap ke bawah".
+     Yang DIHAPUS total di v2.0 (semua "bulat-bulat" milik AVI):
+     - ORB 36dp di atas bubble (titik biru kecil melayang) — HAPUS;
+     - sisa logo 4 titik yang bocor dari layar utama di belakang
+       panel — akarnya adalah scrim tipis 0,30; kini panel = LEMBAR
+       GELAP PENUH (bg_panel_jarvis) sehingga app di belakang TIDAK
+       terlihat lagi. Panel berdiri sendiri sebagai konsol AVI.
 
-     Baru b20 (laporan pemilik): DASAR GELAP menguat dari bawah
-     (pola Google Assistan) di zona jawaban + pill — app di belakang
-     tidak lagi bertabrakan dengan teks melayang; mic saat
-     MENDENGARKAN = tombol SOLID teal + ikon gelap + pill berubah
-     "Mendengarkan…" (sebelumnya cuma latar 18% — tak terlihat jelas).
+     Yang TERSISA — hanya yang berfungsi:
+     - jawaban AVI dalam bubble kaca gelap di atas pill;
+     - SATU bar bawah: pill "Tanya AVI…" + tombol suara tiga peran
+       (mic mendengarkan → kirim ketikan → stop saat AVI bicara);
+     - kata-kata pemilik HIDUP DI DALAM pill, hilang sendiri saat
+       giliran tuntas;
+     - usap ke bawah / ketuk area kosong = tutup;
+     - mesin menyala otomatis begitu panel tergambar; tanpa izin mic
+       pill ketik tetap hidup.
 
-     Baru b21 (laporan pemilik): (1) balasan AI kini dalam BUBBLE
-     (bubble_jawaban_sesi — pola obrolan, warna sama dgn pill);
-     (2) izin mic DIMINTA seketika panel terbuka, dan begitu
-     diberikan mic langsung menyala tanpa disentuh; (3) panel tak
-     tidur sendiri saat hening — terus mendengar (pola web b19).
-
-     Baru b23 (laporan pemilik): LOGO 4 TITIK di sisi kiri bubble
-     jawaban DIHAPUS TOTAL — "kita bukan Google". Baris jawaban
-     kini murni bubble; kata TANPA lambang apa pun.
-
-     Mesin menyala otomatis begitu panel tergambar (mic langsung
-     siap mendengarkan — Task 17); tanpa izin mic, pill ketik tetap
-     hidup. Root menelan sentuhan kosong = tutup.-->
+     Catatan jujur: lingkaran putih yang muncul SEKETIKA saat tombol
+     home DITAHAN adalah animasi tekan bawaan sistem (SystemUI/ROM)
+     — digambar sistem DI ATAS jendela aplikasi mana pun, ikon di
+     dalamnya sudah dikosongkan sejak v1.9, wadahnya sendiri tidak
+     berhak dihapus oleh aplikasi biasa. Panel gelap penuh membuat
+     layar tetap bersih setelah panel terbuka. ===================== -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/akarSesi"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#4D070F0C"
+    android:background="@drawable/bg_panel_jarvis"
     android:clickable="true"
     android:focusable="true">
-
-    <!-- ===== dasar gelap zona bawah (b20, pola Google Assistan):
-         jawaban melayang + pill selalu terbaca walau app di
-         belakang ramai — layar atas tetap 0,30 terang ===== -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="340dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/gradasi_bawah"/>
 
     <!-- ===== jawaban AVI: melayang, menempel di atas pill ===== -->
     <LinearLayout
@@ -65,18 +47,6 @@
         android:paddingRight="16dp"
         android:paddingBottom="92dp">
 
-        <!-- v1.9 (permintaan pemilik: "ini bukan JARVIS") — ORB AVI
-             kini hadir di panel: bernapas pelan saat siap, berdenyut
-             mengikuti suara saat mendengar, berputar saat berpikir,
-             bergelombang saat bicara. Identitas AVI, bukan Google. -->
-        <com.avi.assistant.OrbView
-            android:id="@+id/orbSesi"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="12dp"
-            android:contentDescription="Orb AVI"/>
-
         <LinearLayout
             android:id="@+id/barisJawabanSesi"
             android:layout_width="match_parent"
@@ -84,21 +54,19 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
-            <!-- b23: logo 4 titik dihapus (pemilik: "kita bukan
-                 Google") — baris jawaban murni bubble -->
             <TextView
                 android:id="@+id/tvAviSesi"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="#F2F7F5"
+                android:textColor="@color/sesi_teks"
                 android:textSize="15sp"
                 android:lineSpacingMultiplier="1.35"
                 android:background="@drawable/bubble_jawaban_sesi"
-                android:paddingLeft="14dp"
-                android:paddingRight="14dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
                 android:maxLines="12"
                 android:ellipsize="end"/>
         </LinearLayout>
@@ -116,12 +84,12 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="54dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:background="@drawable/bg_pil_sesi"
-            android:paddingLeft="18dp"
-            android:paddingRight="6dp">
+            android:paddingLeft="20dp"
+            android:paddingRight="7dp">
 
             <EditText
                 android:id="@+id/etPilSesi"
@@ -130,8 +98,8 @@
                 android:layout_weight="1"
                 android:background="@null"
                 android:hint="Tanya AVI…"
-                android:textColor="#F2F7F5"
-                android:textColorHint="#A8F2F7F5"
+                android:textColor="@color/sesi_teks"
+                android:textColorHint="#A88FA3C8"
                 android:textSize="15sp"
                 android:maxLines="1"
                 android:inputType="text"
@@ -143,7 +111,7 @@
                 android:id="@+id/bSuaraSesi"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="6dp"
+                android:layout_marginLeft="8dp"
                 android:background="@drawable/bg_tombol_suara"
                 android:clickable="true"
                 android:focusable="true"
@@ -155,7 +123,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_mic"
-                    android:tint="#38BDF8"
+                    android:tint="@color/sesi_aksen"
                     android:contentDescription=""/>
             </FrameLayout>
         </LinearLayout>
