@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.9 (permintaan pemilik): ikon asisten SystemUI DIKOSONGKAN.
+     Tahan tombol home harus LANGSUNG menampilkan panel AVI — tanpa
+     logo/ikon launcher yang muncul sekejap. Meta-data
+     com.android.systemui.action_assist_icon kini menunjuk drawable
+     transparan ini. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@android:color/transparent"/>
+    <size android:width="24dp" android:height="24dp"/>
+</shape>

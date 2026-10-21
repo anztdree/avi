@@ -4,5 +4,5 @@
      stop putih 0.14) lewat GradientDrawable.setColor(). -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
-    <solid android:color="#1A2DD4BF"/>
+    <solid android:color="#1A38BDF8"/>
 </shape>

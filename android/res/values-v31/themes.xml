@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v1.9 (permintaan pemilik): SPLASH SCREEN sistem Android 12+
+         DIBUNGKAM untuk panel asisten. Tahan tombol home = panel AVI
+         langsung tampil — tanpa ikon launcher, tanpa kilatan terang.
+         Activity translucent memang biasanya dilewati sistem, ini rem
+         ganda untuk ROM low-RAM yang tetap menampilkan starting window.
+         Semua item tema dasar dinyatakan ulang karena resource
+         kualifier v31 TIDAK mewarisi values/ versi dasar. -->
+    <style name="TemaSesiOrbit" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowSplashScreenBackground">#070B14</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+    </style>
+</resources>

@@ -60,6 +60,7 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
     private EditText etPil;
     private ImageView ikonSuara;
     private TextView tvAvi;
+    private OrbView orb;             // v1.9: identitas orb di panel asisten
     private View bSuara;
     private LiveEngine mesin;
     private boolean mesinJalan;
@@ -85,6 +86,7 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
         ikonSuara = findViewById(R.id.ikonSuaraSesi);
         bSuara = findViewById(R.id.bSuaraSesi);
         tvAvi = findViewById(R.id.tvAviSesi);
+        orb = findViewById(R.id.orbSesi);   // v1.9: orb JARVIS di panel
 
         // usap ke bawah = tutup (pola Google); ketukan biasa diteruskan
         // ke onClick akar = KETUK AREA KOSONG = tutup (pola web disetujui)
@@ -214,7 +216,7 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
         if (!micSip) {                        // mic tak tersedia — ketik saja
             ikonSuara.setImageResource(R.drawable.ic_mic);
             ikonSuara.setColorFilter(0xFF9AA8A4);
-            latar.setColor(0x1A2DD4BF);
+            latar.setColor(0x1A38BDF8);
             bSuara.setEnabled(false);
             berhentiDenyut();
             return;
@@ -237,8 +239,8 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
             ikonSuara.setImageResource(R.drawable.ic_mic);
             // b20: saat mendengarkan tombol SOLID teal + ikon gelap —
             // keadaan kerja jelas terlihat (latar 18% dulu terlalu samar)
-            ikonSuara.setColorFilter(dengar ? 0xFF07120F : 0xFF2DD4BF);
-            latar.setColor(dengar ? 0xFF2DD4BF : 0x1A2DD4BF);
+            ikonSuara.setColorFilter(dengar ? 0xFF05131F : 0xFF38BDF8);
+            latar.setColor(dengar ? 0xFF38BDF8 : 0x1A38BDF8);
             denyutkan(dengar);
         }
     }
@@ -267,6 +269,7 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
 
     @Override public void keadaan(int k) {
         keadaan = k;
+        if (orb != null) orb.setKeadaan(k);   // v1.9: orb ikut berdenyut
         perbaruiTombol();
     }
 
@@ -301,7 +304,7 @@ public class OrbitAssistActivity extends Activity implements LiveEngine.Pendenga
     }
 
     @Override public void rms(float rmsdb) {
-        // titik dihapus — tidak ada yang perlu digerakkan
+        if (orb != null) orb.setRms(rmsdb);   // v1.9: denyut ikut suara
     }
 
     @Override public void tetidur() { pamit(); }

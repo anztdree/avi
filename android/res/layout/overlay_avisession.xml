@@ -65,6 +65,18 @@
         android:paddingRight="16dp"
         android:paddingBottom="92dp">
 
+        <!-- v1.9 (permintaan pemilik: "ini bukan JARVIS") — ORB AVI
+             kini hadir di panel: bernapas pelan saat siap, berdenyut
+             mengikuti suara saat mendengar, berputar saat berpikir,
+             bergelombang saat bicara. Identitas AVI, bukan Google. -->
+        <com.avi.assistant.OrbView
+            android:id="@+id/orbSesi"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="Orb AVI"/>
+
         <LinearLayout
             android:id="@+id/barisJawabanSesi"
             android:layout_width="match_parent"
@@ -143,7 +155,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_mic"
-                    android:tint="#2DD4BF"
+                    android:tint="#38BDF8"
                     android:contentDescription=""/>
             </FrameLayout>
         </LinearLayout>

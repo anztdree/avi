@@ -69,6 +69,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     private LiveEngine mesin;
     private GestureDetector usap;
     private ObjectAnimator denyut;
+    private OrbView orb;             // v1.9: identitas orb di panel asisten
     private int keadaan = OrbView.SIAP;
     private boolean micSip = true;
     private boolean transkripDiPil = false;
@@ -86,6 +87,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
         ikonSuara = akar.findViewById(R.id.ikonSuaraSesi);
         bSuara = akar.findViewById(R.id.bSuaraSesi);
         tvAvi = akar.findViewById(R.id.tvAviSesi);
+        orb = akar.findViewById(R.id.orbSesi);   // v1.9: orb JARVIS di panel
 
         // usap ke bawah = tutup; ketukan biasa diteruskan ke onClick akar
         // = KETUK AREA KOSONG = tutup (pola web disetujui)
@@ -226,7 +228,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
         if (!micSip) {                        // mic tak tersedia — ketik saja
             ikonSuara.setImageResource(R.drawable.ic_mic);
             ikonSuara.setColorFilter(0xFF9AA8A4);
-            latar.setColor(0x1A2DD4BF);
+            latar.setColor(0x1A38BDF8);
             bSuara.setEnabled(false);
             berhentiDenyut();
             return;
@@ -249,8 +251,8 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
             ikonSuara.setImageResource(R.drawable.ic_mic);
             // b20: saat mendengarkan tombol SOLID teal + ikon gelap —
             // keadaan kerja jelas terlihat (latar 18% dulu terlalu samar)
-            ikonSuara.setColorFilter(dengar ? 0xFF07120F : 0xFF2DD4BF);
-            latar.setColor(dengar ? 0xFF2DD4BF : 0x1A2DD4BF);
+            ikonSuara.setColorFilter(dengar ? 0xFF05131F : 0xFF38BDF8);
+            latar.setColor(dengar ? 0xFF38BDF8 : 0x1A38BDF8);
             denyutkan(dengar);
         }
     }
@@ -279,6 +281,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
 
     @Override public void keadaan(int k) {
         keadaan = k;
+        if (orb != null) orb.setKeadaan(k);   // v1.9: orb ikut berdenyut
         perbaruiTombol();
     }
 
@@ -313,7 +316,7 @@ public class AviSession extends VoiceInteractionSession implements LiveEngine.Pe
     }
 
     @Override public void rms(float rmsdb) {
-        // titik dihapus — tidak ada yang perlu digerakkan
+        if (orb != null) orb.setRms(rmsdb);   // v1.9: denyut ikut suara
     }
 
     @Override public void tetidur() {

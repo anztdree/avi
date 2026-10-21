@@ -95,6 +95,7 @@ public final class R {
     public static final int orb_mini=0x7f020025;
     public static final int pil_tutup=0x7f020026;
     public static final int titik_status=0x7f020027;
+    public static final int transparan=0x7f020028;
   }
   public static final class id {
     public static final int akarSesi=0x7f030000;
@@ -126,57 +127,58 @@ public final class R {
     public static final int ikonSuaraSesi=0x7f03001a;
     public static final int lvModel=0x7f03001b;
     public static final int orbLive=0x7f03001c;
-    public static final int papanLive=0x7f03001d;
-    public static final int pbLevel=0x7f03001e;
-    public static final int rbCerah=0x7f03001f;
-    public static final int rbGKetat=0x7f030020;
-    public static final int rbGLembut=0x7f030021;
-    public static final int rbGMati=0x7f030022;
-    public static final int rbGelap=0x7f030023;
-    public static final int rbGemini=0x7f030024;
-    public static final int rbH12=0x7f030025;
-    public static final int rbH15=0x7f030026;
-    public static final int rbH5=0x7f030027;
-    public static final int rbH8=0x7f030028;
-    public static final int rbIngat10=0x7f030029;
-    public static final int rbIngat20=0x7f03002a;
-    public static final int rbIngat50=0x7f03002b;
-    public static final int rbNvidia=0x7f03002c;
-    public static final int rbOpenrouter=0x7f03002d;
-    public static final int rbProvGemini=0x7f03002e;
-    public static final int rbProvNvidia=0x7f03002f;
-    public static final int rbProvOpenrouter=0x7f030030;
-    public static final int rgGerbang=0x7f030031;
-    public static final int rgHening=0x7f030032;
-    public static final int rgIngat=0x7f030033;
-    public static final int rgPenyedia=0x7f030034;
-    public static final int rgProv=0x7f030035;
-    public static final int rgTema=0x7f030036;
-    public static final int sbRate=0x7f030037;
-    public static final int scrollTranskrip=0x7f030038;
-    public static final int swTts=0x7f030039;
-    public static final int tvAndaLive=0x7f03003a;
-    public static final int tvAsistenStatus=0x7f03003b;
-    public static final int tvAviLive=0x7f03003c;
-    public static final int tvAviSesi=0x7f03003d;
-    public static final int tvDots=0x7f03003e;
-    public static final int tvFrasa=0x7f03003f;
-    public static final int tvInstruksi=0x7f030040;
-    public static final int tvJudul=0x7f030041;
-    public static final int tvKalibrasi=0x7f030042;
-    public static final int tvLangkah=0x7f030043;
-    public static final int tvModel=0x7f030044;
-    public static final int tvNarasi=0x7f030045;
-    public static final int tvPetunjukKey=0x7f030046;
-    public static final int tvPetunjukOnboard=0x7f030047;
-    public static final int tvRate=0x7f030048;
-    public static final int tvSalam=0x7f030049;
-    public static final int tvSalamOnboard=0x7f03004a;
-    public static final int tvStatusLive=0x7f03004b;
-    public static final int tvStatusModel=0x7f03004c;
-    public static final int tvSuara=0x7f03004d;
-    public static final int tvSub=0x7f03004e;
-    public static final int tvUmpan=0x7f03004f;
+    public static final int orbSesi=0x7f03001d;
+    public static final int papanLive=0x7f03001e;
+    public static final int pbLevel=0x7f03001f;
+    public static final int rbCerah=0x7f030020;
+    public static final int rbGKetat=0x7f030021;
+    public static final int rbGLembut=0x7f030022;
+    public static final int rbGMati=0x7f030023;
+    public static final int rbGelap=0x7f030024;
+    public static final int rbGemini=0x7f030025;
+    public static final int rbH12=0x7f030026;
+    public static final int rbH15=0x7f030027;
+    public static final int rbH5=0x7f030028;
+    public static final int rbH8=0x7f030029;
+    public static final int rbIngat10=0x7f03002a;
+    public static final int rbIngat20=0x7f03002b;
+    public static final int rbIngat50=0x7f03002c;
+    public static final int rbNvidia=0x7f03002d;
+    public static final int rbOpenrouter=0x7f03002e;
+    public static final int rbProvGemini=0x7f03002f;
+    public static final int rbProvNvidia=0x7f030030;
+    public static final int rbProvOpenrouter=0x7f030031;
+    public static final int rgGerbang=0x7f030032;
+    public static final int rgHening=0x7f030033;
+    public static final int rgIngat=0x7f030034;
+    public static final int rgPenyedia=0x7f030035;
+    public static final int rgProv=0x7f030036;
+    public static final int rgTema=0x7f030037;
+    public static final int sbRate=0x7f030038;
+    public static final int scrollTranskrip=0x7f030039;
+    public static final int swTts=0x7f03003a;
+    public static final int tvAndaLive=0x7f03003b;
+    public static final int tvAsistenStatus=0x7f03003c;
+    public static final int tvAviLive=0x7f03003d;
+    public static final int tvAviSesi=0x7f03003e;
+    public static final int tvDots=0x7f03003f;
+    public static final int tvFrasa=0x7f030040;
+    public static final int tvInstruksi=0x7f030041;
+    public static final int tvJudul=0x7f030042;
+    public static final int tvKalibrasi=0x7f030043;
+    public static final int tvLangkah=0x7f030044;
+    public static final int tvModel=0x7f030045;
+    public static final int tvNarasi=0x7f030046;
+    public static final int tvPetunjukKey=0x7f030047;
+    public static final int tvPetunjukOnboard=0x7f030048;
+    public static final int tvRate=0x7f030049;
+    public static final int tvSalam=0x7f03004a;
+    public static final int tvSalamOnboard=0x7f03004b;
+    public static final int tvStatusLive=0x7f03004c;
+    public static final int tvStatusModel=0x7f03004d;
+    public static final int tvSuara=0x7f03004e;
+    public static final int tvSub=0x7f03004f;
+    public static final int tvUmpan=0x7f030050;
   }
   public static final class layout {
     public static final int activity_kalibrasi=0x7f040000;
@@ -217,6 +219,13 @@ public final class R {
      * kilatan hitam; isi sesi kini LEMBAR BAWAH ala Google Assistant —
      * aplikasi di bawah tetap terlihat penuh, jadi bar sistem pun
      * transparan (bukan gelap) supaya tidak ada strip penutup.
+     * v1.9 (permintaan pemilik): SPLASH SCREEN sistem Android 12+
+     * DIBUNGKAM untuk panel asisten. Tahan tombol home = panel AVI
+     * langsung tampil — tanpa ikon launcher, tanpa kilatan terang.
+     * Activity translucent memang biasanya dilewati sistem, ini rem
+     * ganda untuk ROM low-RAM yang tetap menampilkan starting window.
+     * Semua item tema dasar dinyatakan ulang karena resource
+     * kualifier v31 TIDAK mewarisi values/ versi dasar.
      */
     public static final int TemaSesiOrbit=0x7f070005;
   }
